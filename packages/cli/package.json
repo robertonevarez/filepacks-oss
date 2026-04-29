@@ -1,0 +1,32 @@
+{
+  "name": "filepacks",
+  "description": "CLI for deterministic .fpk artifacts.",
+  "version": "0.1.0",
+  "author": "filepacks",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "filepacks": "./bin/filepacks.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "bin",
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -b && chmod +x bin/filepacks.js",
+    "test": "npm run build && node --test \"test/**/*.test.mjs\""
+  },
+  "dependencies": {
+    "@filepacks/core": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

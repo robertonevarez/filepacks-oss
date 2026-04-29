@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+.DS_Store
+
+.env
+.env.*
+
+*.fpk
+!spec/examples/**/*.fpk

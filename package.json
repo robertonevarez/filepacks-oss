@@ -1,0 +1,16 @@
+{
+  "name": "filepacks",
+  "private": true,
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @filepacks/core && npm run build -w filepacks",
+    "build:core": "npm run build -w @filepacks/core",
+    "build:cli": "npm run build -w filepacks",
+    "test": "npm run test:core && npm run test:cli",
+    "test:core": "npm run test -w @filepacks/core",
+    "test:cli": "npm run test -w filepacks"
+  }
+}

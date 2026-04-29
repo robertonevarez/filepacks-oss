@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.filepacks.dev/schemas/manifest-v1.schema.json",
+  "title": "filepacks generic manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_name",
+    "created_with",
+    "file_count",
+    "files",
+    "format_version",
+    "payload_digest",
+    "total_bytes"
+  ],
+  "properties": {
+    "artifact_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_with": {
+      "const": "filepacks"
+    },
+    "file_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    },
+    "format_version": {
+      "const": 1
+    },
+    "payload_digest": {
+      "$ref": "#/$defs/sha256"
+    },
+    "total_bytes": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "$defs": {
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hash", "path", "size"],
+      "properties": {
+        "hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "path": {
+          "$ref": "#/$defs/normalizedRelativePath"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "normalizedRelativePath": {
+      "type": "string",
+      "minLength": 1,
+      "allOf": [
+        {"not": {"pattern": "^/"}},
+        {"not": {"pattern": "/$"}},
+        {"not": {"pattern": "\\\\"}},
+        {"not": {"pattern": "//"}},
+        {"not": {"pattern": "(^|/)\\.($|/)"}},
+        {"not": {"pattern": "(^|/)\\.\\.($|/)"}}
+      ]
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}
