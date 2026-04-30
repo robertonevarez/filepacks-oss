@@ -1,0 +1,64 @@
+---
+title: Compare
+description: Structurally compare two .fpk artifacts by manifest path, size, and hash.
+---
+
+## Usage
+
+```bash
+filepacks compare <baseline> <candidate>
+```
+
+## What compare does
+
+`compare` performs structural comparison only.
+
+It reads both manifests and reports:
+
+- files added in the candidate
+- files removed from the baseline
+- files changed at the same path
+
+A file is changed when its `size` or `hash` differs.
+
+## Output
+
+Example:
+
+```text
+Compare
+baseline=/absolute/path/to/baseline.fpk
+candidate=/absolute/path/to/candidate.fpk
+ok=false
+added=1
+removed=0
+changed=1
+added_file=reports/new.txt
+changed_file=summary.txt
+```
+
+## Exit behavior
+
+- exit `0`: no differences
+- exit `20`: one or more differences were found
+- exit `1`: usage or file/path error
+
+## Core API
+
+```ts
+const result = await compare({
+  baseline: '/tmp/baseline.fpk',
+  candidate: '/tmp/candidate.fpk',
+})
+
+result.mode // 'structural'
+result.ok
+result.summary
+result.added
+result.removed
+result.changed
+```
+
+## Scope
+
+The current public OSS command does not define semantic comparison modes, typed artifact decisions, or registry-backed references.

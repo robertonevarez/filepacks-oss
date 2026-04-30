@@ -1,0 +1,78 @@
+---
+title: Manifest
+description: The current public format_version 1 manifest fields and validation rules.
+---
+
+`manifest.json` is UTF-8 JSON written with two-space indentation and one trailing newline.
+
+The current public generic manifest uses `format_version: 1`.
+
+## Manifest fields
+
+```json
+{
+  "artifact_name": "example",
+  "created_with": "filepacks",
+  "file_count": 1,
+  "files": [
+    {
+      "hash": "64 lowercase hex SHA-256 digest",
+      "path": "hello.txt",
+      "size": 12
+    }
+  ],
+  "format_version": 1,
+  "payload_digest": "64 lowercase hex SHA-256 digest",
+  "total_bytes": 12
+}
+```
+
+## Required fields
+
+| Field | Rule |
+| --- | --- |
+| `artifact_name` | non-empty string |
+| `created_with` | must be `filepacks` |
+| `file_count` | non-negative integer matching `files.length` |
+| `files` | sorted payload file descriptors |
+| `format_version` | must be `1` |
+| `payload_digest` | SHA-256 digest over the sorted file list |
+| `total_bytes` | sum of all file sizes |
+
+Each file descriptor contains:
+
+| Field | Rule |
+| --- | --- |
+| `path` | normalized payload-relative path |
+| `size` | non-negative integer |
+| `hash` | lowercase hex SHA-256 digest of exact payload bytes |
+
+## Validation behavior
+
+The current public validator rejects manifests when:
+
+- `artifact_name` is empty
+- `created_with` is not `filepacks`
+- `format_version` is not `1`
+- file paths are invalid
+- file entries are duplicated
+- `file_count` does not match the files list
+- `total_bytes` does not match file sizes
+- `payload_digest` does not match the sorted file list
+
+The current public OSS validator also rejects typed artifact fields such as:
+
+- `schema_version`
+- `artifact_type`
+
+Those are explicitly outside the public v0 OSS surface.
+
+## Payload digest computation
+
+The manifest payload digest is computed from the sorted file list using UTF-8 input lines in this form:
+
+```text
+<path>\0<size>\0<hash>\n
+```
+
+The SHA-256 of the concatenated sequence is `payload_digest`.

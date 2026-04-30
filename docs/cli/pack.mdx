@@ -1,0 +1,65 @@
+---
+title: Pack
+description: Create a deterministic .fpk artifact from a directory.
+---
+
+## Usage
+
+```bash
+filepacks pack <input> --output <file>
+```
+
+## Arguments
+
+- `<input>`: input directory to package
+- `--output <file>`: required output path for the `.fpk` artifact
+
+`pack` is the only public CLI command with a flag today, and `--output` is required.
+
+## What pack does
+
+`pack`:
+
+- validates that the input exists and is a directory
+- walks files in lexical order
+- rejects non-regular files
+- hashes each payload file with SHA-256
+- builds a `format_version: 1` manifest
+- writes a deterministic POSIX tar archive
+
+## Output
+
+Example:
+
+```text
+Pack
+input=/absolute/path/to/input
+output=/absolute/path/to/artifact.fpk
+name=input
+digest=sha256:...
+files=2
+bytes=12
+```
+
+The artifact name defaults to the input directory basename in the CLI.
+
+## Constraints
+
+- input must be a directory
+- only regular files are supported
+- payload paths are normalized to use `/`
+- the CLI does not expose a `--name` flag
+
+## Core API
+
+`@filepacks/core pack()` accepts:
+
+```ts
+await pack({
+  input: '/tmp/input',
+  output: '/tmp/example.fpk',
+  name: 'example',
+})
+```
+
+Unlike the CLI, the core API supports an optional `name` field.

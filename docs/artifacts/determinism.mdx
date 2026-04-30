@@ -1,0 +1,65 @@
+---
+title: Determinism
+description: How the current public implementation produces byte-for-byte stable .fpk artifacts.
+---
+
+Determinism is a core guarantee of the current public format.
+
+For the same logical input, a canonical producer should emit the same `.fpk` bytes.
+
+## What the current implementation does
+
+The public core package achieves deterministic output through:
+
+- lexical directory traversal
+- lexical sorting of manifest file entries
+- lexical sorting of payload archive entries
+- exact payload bytes without conversion
+- fixed tar header metadata
+- stable manifest serialization
+- `manifest.json` written first
+
+## Tar header canonicalization
+
+The current public spec fixes these tar header values for every archive entry:
+
+| Field | Value |
+| --- | --- |
+| `uid` | `0` |
+| `gid` | `0` |
+| `uname` | empty string |
+| `gname` | empty string |
+| `mode` | `0644` |
+| `mtime` | Unix epoch |
+| `type` | regular file |
+
+## Why this matters
+
+Stable bytes make the archive digest meaningful.
+
+That helps with:
+
+- reproducible review
+- consistent verification
+- artifact deduplication by digest
+- baseline-versus-candidate comparisons grounded in a stable artifact identity
+
+## Test coverage
+
+The current core tests verify:
+
+- identical logical input produces byte-for-byte identical archives
+- the shipped valid example artifact remains byte-stable and verifiable
+- malformed archives such as non-file entries are rejected deterministically
+
+## What breaks determinism
+
+Determinism would be broken by behavior such as:
+
+- non-lexical traversal
+- carrying through source filesystem timestamps or ownership
+- emitting directory entries
+- changing manifest serialization
+- writing payload entries in a non-canonical order
+
+Those behaviors are intentionally excluded from the current public format.

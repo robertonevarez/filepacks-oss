@@ -1,0 +1,70 @@
+---
+title: CI/CD Integration
+description: Use filepacks in CI to preserve deterministic build or evaluation evidence and compare it against a baseline artifact.
+---
+
+The public OSS CLI is useful in CI when you want generated files to become a deterministic artifact that can be reviewed later.
+
+## Basic CI pattern
+
+1. Run a job that generates output files
+2. Package that directory with `filepacks pack`
+3. Verify the artifact with `filepacks verify`
+4. Compare it against a known baseline artifact with `filepacks compare`
+5. Upload the `.fpk` file as a job artifact for human review if needed
+
+```bash
+filepacks pack ./build-output --output ./candidate.fpk
+filepacks verify ./candidate.fpk
+filepacks compare ./baseline.fpk ./candidate.fpk
+```
+
+## Exit handling
+
+For the current public CLI:
+
+- `verify` exits `0` when the artifact is valid
+- `verify` exits `1` when the artifact is invalid
+- `compare` exits `0` when the artifacts are identical
+- `compare` exits `20` when files differ
+
+That makes it easy to gate a job on structural equivalence.
+
+## Example GitHub Actions step
+
+```yaml
+- name: Install filepacks
+  run: npm install -g filepacks
+
+- name: Package output
+  run: filepacks pack ./build-output --output ./candidate.fpk
+
+- name: Verify artifact
+  run: filepacks verify ./candidate.fpk
+
+- name: Compare against baseline
+  run: filepacks compare ./baseline.fpk ./candidate.fpk
+```
+
+If `compare` exits `20`, the workflow can fail and preserve `candidate.fpk` for review.
+
+## What to preserve
+
+For the current OSS workflow, keep at least:
+
+- `candidate.fpk`
+- the baseline artifact used for comparison, if it is not already versioned elsewhere
+- the job log that captured the compare summary
+
+## Baseline management
+
+The public OSS docs do not define a baseline registry or tag workflow. In CI, the simplest pattern is to store or version the baseline artifact explicitly and compare against that file path.
+
+## Good fit for CI
+
+filepacks works well when you want:
+
+- reproducible build evidence
+- a reviewable snapshot of generated files
+- a stable baseline-versus-candidate comparison primitive
+- one artifact file that humans and automation can both inspect later

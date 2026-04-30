@@ -1,0 +1,64 @@
+---
+title: Format
+description: The current public .fpk archive layout and file-level rules.
+---
+
+## Archive layout
+
+A `.fpk` artifact is a POSIX tar archive containing exactly one manifest and zero or more payload files.
+
+Canonical layout:
+
+```text
+manifest.json
+payload/<relative-path>
+payload/<relative-path>
+...
+```
+
+## Required rules
+
+Producer requirements from the current public spec:
+
+- `manifest.json` must be the first archive entry
+- payload entries must be stored under `payload/`
+- payload entries must be regular file entries
+- directory entries must not be emitted
+- entries outside `manifest.json` and `payload/` must not be emitted
+- duplicate archive entry names must not be emitted
+- duplicate payload relative paths must not be emitted
+- payload entries must be emitted in lexical order by payload relative path
+
+Verifier requirements:
+
+- `manifest.json` must exist exactly once
+- archive entries must be regular files
+- entries outside `manifest.json` and `payload/` must be rejected
+- invalid payload paths must be rejected
+- duplicate payload relative paths must be rejected
+
+## Path rules
+
+Payload paths in the manifest:
+
+- must be non-empty
+- must not start with `/`
+- must not contain backslashes
+- must not contain `//`
+- must not contain empty path segments
+- must not contain `.` or `..` path segments
+- must use `/` separators on every platform
+
+Examples:
+
+| Path | Valid |
+| --- | --- |
+| `results.jsonl` | yes |
+| `outputs/run-1.json` | yes |
+| `/outputs/run-1.json` | no |
+| `outputs\\run-1.json` | no |
+| `outputs/../run-1.json` | no |
+
+## Artifact identity
+
+For the current generic public format, the artifact digest is the SHA-256 digest of the exact `.fpk` archive bytes.

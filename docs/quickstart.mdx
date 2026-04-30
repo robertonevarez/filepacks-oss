@@ -1,24 +1,122 @@
-# Quickstart
+---
+title: Quickstart
+description: Package a directory into a .fpk artifact, inspect it, verify it, and compare it against another run.
+---
 
-Install the latest CLI from npm:
+This quickstart follows the current public OSS workflow:
+
+1. Package a baseline directory with `filepacks pack`
+2. Package a candidate directory with `filepacks pack`
+3. Inspect either artifact with `filepacks inspect`
+4. Verify integrity with `filepacks verify`
+5. Compare the two artifacts with `filepacks compare`
+
+## Install the CLI
 
 ```bash
 npm install -g filepacks
 ```
 
-Or run it without a global install:
+Or run commands without a global install:
 
 ```bash
-npx filepacks pack ./run --output run.fpk
+npx filepacks --help
 ```
 
-Core workflow:
+## Create two example directories
 
 ```bash
-filepacks pack ./run --output run.fpk
-filepacks inspect run.fpk
-filepacks verify run.fpk
-filepacks compare baseline.fpk candidate.fpk
+mkdir -p ./demo/baseline
+mkdir -p ./demo/candidate
+
+printf 'hello from baseline\n' > ./demo/baseline/summary.txt
+printf 'hello from candidate\n' > ./demo/candidate/summary.txt
 ```
 
-`compare` is the review primitive for baseline-vs-candidate changes.
+## Pack the baseline and candidate
+
+```bash
+filepacks pack ./demo/baseline --output ./baseline.fpk
+filepacks pack ./demo/candidate --output ./candidate.fpk
+```
+
+`pack` writes a deterministic `.fpk` archive and prints a summary like:
+
+```text
+Pack
+input=/absolute/path/to/demo/baseline
+output=/absolute/path/to/baseline.fpk
+name=baseline
+digest=sha256:...
+files=1
+bytes=20
+```
+
+## Inspect an artifact
+
+```bash
+filepacks inspect ./baseline.fpk
+```
+
+Example output:
+
+```text
+Inspect
+path=/absolute/path/to/baseline.fpk
+name=baseline
+version=1
+digest=sha256:...
+files=1
+bytes=20
+```
+
+## Verify integrity
+
+```bash
+filepacks verify ./baseline.fpk
+```
+
+Example output:
+
+```text
+Verify
+path=/absolute/path/to/baseline.fpk
+ok=true
+files_checked=1
+```
+
+## Compare baseline and candidate
+
+```bash
+filepacks compare ./baseline.fpk ./candidate.fpk
+```
+
+If the artifacts differ, `compare` exits with status `20` and prints a structural summary:
+
+```text
+Compare
+baseline=/absolute/path/to/baseline.fpk
+candidate=/absolute/path/to/candidate.fpk
+ok=false
+added=0
+removed=0
+changed=1
+changed_file=summary.txt
+```
+
+If the artifacts are identical, `compare` exits `0` with `ok=true`.
+
+## What you just used
+
+- `filepacks pack <input> --output <file>`
+- `filepacks inspect <file>`
+- `filepacks verify <file>`
+- `filepacks compare <baseline> <candidate>`
+
+Those four commands are the current public CLI surface.
+
+## Next steps
+
+- Read [Why filepacks](/docs/why-filepacks) for the design goal
+- See [Artifacts](/docs/artifacts) for the `.fpk` format and manifest rules
+- Use the [CLI overview](/docs/cli) for command-by-command reference

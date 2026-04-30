@@ -1,0 +1,49 @@
+---
+title: Inspect
+description: Read artifact metadata from an existing .fpk file.
+---
+
+## Usage
+
+```bash
+filepacks inspect <file>
+```
+
+## Arguments
+
+- `<file>`: path to an existing `.fpk` artifact
+
+The current CLI requires the path to end in `.fpk`.
+
+## What inspect does
+
+`inspect` reads the artifact and prints a metadata summary derived from the manifest.
+
+Example output:
+
+```text
+Inspect
+path=/absolute/path/to/artifact.fpk
+name=artifact
+version=1
+digest=sha256:...
+files=2
+bytes=12
+```
+
+## Notes
+
+- the CLI summary does not currently print the per-file list
+- `@filepacks/core inspect()` returns the parsed manifest and payload file entries programmatically
+- invalid or malformed artifacts are rejected before a summary is produced
+
+## Core API
+
+```ts
+const artifact = await inspect({artifact: '/tmp/example.fpk'})
+
+artifact.manifest.artifact_name
+artifact.manifest.files
+artifact.payloadFiles
+artifact.artifactDigest
+```

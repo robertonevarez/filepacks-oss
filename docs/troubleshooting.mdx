@@ -1,0 +1,96 @@
+---
+title: Troubleshooting
+description: Common public OSS filepacks errors and what they mean.
+---
+
+## `Input path does not exist`
+
+Cause: `filepacks pack` was given a directory path that does not exist.
+
+Fix:
+
+```bash
+ls ./your-input-directory
+filepacks pack ./your-input-directory --output ./artifact.fpk
+```
+
+## `Input path is not a directory`
+
+Cause: `pack` only accepts a directory as input.
+
+Fix: pass a directory, not a single file.
+
+## `Unsupported file type at:`
+
+Cause: the input contains a non-regular file such as a symlink, device, socket, or pipe.
+
+Fix: package only regular files.
+
+The current implementation rejects non-regular file inputs.
+
+## `Artifact path must end with .fpk`
+
+Cause: `inspect`, `verify`, or `compare` was given a path without the `.fpk` extension.
+
+Fix: pass a real artifact path ending in `.fpk`.
+
+## `Artifact path does not exist`
+
+Cause: the artifact path passed to `inspect`, `verify`, or `compare` does not exist.
+
+Fix:
+
+```bash
+ls ./artifact.fpk
+filepacks inspect ./artifact.fpk
+```
+
+## `Artifact manifest.json must be the first archive entry`
+
+Cause: the archive does not follow the public `.fpk` format.
+
+Fix: recreate the artifact with `filepacks pack`.
+
+## `Unsupported archive entry type: directory`
+
+Cause: the archive contains a non-file tar entry.
+
+Fix: use a valid `.fpk` artifact. The public format allows only file entries.
+
+## `Invalid manifest.json:`
+
+Cause: the manifest is malformed, unsupported, or violates the public format rules.
+
+Examples include:
+
+- invalid JSON
+- unsupported `format_version`
+- duplicate file paths
+- invalid payload digest
+- typed artifact fields such as `schema_version` or `artifact_type`
+
+Fix: recreate the artifact with the current public CLI or core package.
+
+## `verify` reports `ok=false`
+
+Cause: payload files no longer match the manifest.
+
+Mismatch codes may include:
+
+- `missing_payload_file`
+- `unexpected_payload_file`
+- `size_mismatch`
+- `hash_mismatch`
+- `digest_mismatch`
+- `manifest_invalid`
+- `archive_malformed`
+
+Fix: inspect the artifact source, then recreate the `.fpk` file from a trusted directory.
+
+## `compare` exits `20`
+
+Cause: the baseline and candidate differ structurally.
+
+This is expected when any file was added, removed, or changed.
+
+Use the printed `added_file=...`, `removed_file=...`, and `changed_file=...` lines to see what changed.

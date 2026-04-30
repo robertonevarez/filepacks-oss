@@ -1,0 +1,56 @@
+---
+title: Overview
+description: The current public CLI surface and how it maps to the core library.
+---
+
+The current public CLI is intentionally narrow.
+
+Supported commands:
+
+```bash
+filepacks pack <input> --output <file>
+filepacks inspect <file>
+filepacks verify <file>
+filepacks compare <baseline> <candidate>
+```
+
+Unsupported commands are not part of the public OSS surface, including `show`, `import`, `registry`, `list`, `tag`, `baseline`, `unpack`, and `config`.
+
+## Global help
+
+```bash
+filepacks --help
+```
+
+The current help output lists the four supported commands and a single pack example.
+
+## Command behavior summary
+
+| Command | What it does | Exit behavior |
+| --- | --- | --- |
+| `pack` | Create a deterministic `.fpk` artifact from a directory | `0` on success, `1` on usage or file errors |
+| `inspect` | Read artifact metadata from a `.fpk` file | `0` on success, `1` on usage or file errors |
+| `verify` | Check payload files against the manifest | `0` when valid, `1` when invalid or on usage/file errors |
+| `compare` | Structurally compare two artifacts | `0` when identical, `20` when different, `1` on usage/file errors |
+
+## Output style
+
+The CLI uses line-oriented plain text output rather than JSON.
+
+Examples:
+
+- `pack` prints `input=`, `output=`, `name=`, `digest=`, `files=`, `bytes=`
+- `inspect` prints `path=`, `name=`, `version=`, `digest=`, `files=`, `bytes=`
+- `verify` prints `ok=true` or `ok=false`
+- `compare` prints `ok=`, summary counts, and per-file change lines
+
+## Core library mapping
+
+The CLI is a conservative wrapper around `@filepacks/core`:
+
+- CLI `pack` -> `pack()`
+- CLI `inspect` -> `inspect()`
+- CLI `verify` -> `verify()`
+- CLI `compare` -> `compare()`
+
+Use the core package when you need structured results in code.

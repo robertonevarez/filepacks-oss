@@ -1,0 +1,38 @@
+---
+title: Overview
+description: The current public .fpk artifact model and why manifest-first packaging matters.
+---
+
+The public filepacks artifact is a deterministic `.fpk` archive.
+
+It contains:
+
+- `manifest.json` as the first entry
+- payload files under `payload/`
+
+The current public OSS surface uses generic `format_version: 1` manifests only.
+
+## Why the artifact format matters
+
+The format is the trust anchor for the current OSS release:
+
+- the artifact is portable as one file
+- the manifest is the canonical file inventory
+- verification is local and deterministic
+- comparison is manifest-driven
+
+## Public artifact guarantees
+
+- `.fpk` is a POSIX tar archive
+- `manifest.json` must appear exactly once
+- `manifest.json` must be the first entry
+- entries outside `manifest.json` and `payload/` are invalid
+- payload entries must be regular files
+- directory entries must not be emitted
+- payload paths must be normalized relative paths
+
+## See also
+
+- [Format](/docs/artifacts/format)
+- [Manifest](/docs/artifacts/manifest)
+- [Determinism](/docs/artifacts/determinism)

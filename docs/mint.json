@@ -29,24 +29,48 @@
       "url": "https://github.com/anomalyco/filepacks"
     },
     {
-      "name": "CLI Docs",
+      "name": "Quickstart",
       "icon": "book",
       "url": "/quickstart"
     }
   ],
   "navigation": [
     {
-      "group": "Getting Started",
+      "group": "Introduction",
       "pages": [
+        "index",
         "quickstart",
-        "cli",
-        "installation"
+        "installation",
+        "why-filepacks",
+        "concepts",
+        "diffing"
       ]
     },
     {
-      "group": "Reference",
+      "group": "Artifacts",
       "pages": [
-        "spec"
+        "artifacts",
+        "artifacts/format",
+        "artifacts/manifest",
+        "artifacts/determinism"
+      ]
+    },
+    {
+      "group": "CLI",
+      "pages": [
+        "cli",
+        "cli/pack",
+        "cli/inspect",
+        "cli/verify",
+        "cli/compare"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "ci-cd-integration",
+        "faq",
+        "troubleshooting"
       ]
     }
   ],

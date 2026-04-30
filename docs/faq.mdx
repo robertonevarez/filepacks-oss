@@ -1,0 +1,69 @@
+---
+title: FAQ
+description: Common questions about the current public filepacks OSS surface.
+---
+
+## What is a `.fpk` file?
+
+A `.fpk` file is a deterministic POSIX tar archive with:
+
+- `manifest.json` as the first entry
+- payload files stored under `payload/`
+
+## What commands are publicly supported?
+
+The public CLI supports only:
+
+- `filepacks pack <input> --output <file>`
+- `filepacks inspect <file>`
+- `filepacks verify <file>`
+- `filepacks compare <baseline> <candidate>`
+
+## Does the public CLI support tags, baselines, or registries?
+
+No. Those flows are outside the current public OSS surface.
+
+## Can I inspect an artifact without unpacking it?
+
+Yes. `filepacks inspect <file>` reads artifact metadata directly from the `.fpk` file.
+
+## How do I verify corruption or drift?
+
+Run:
+
+```bash
+filepacks verify ./artifact.fpk
+```
+
+If the artifact is invalid, `verify` exits non-zero and reports mismatch lines.
+
+## How do I compare two artifacts?
+
+Run:
+
+```bash
+filepacks compare ./baseline.fpk ./candidate.fpk
+```
+
+The command exits `0` if they are structurally identical and `20` if files were added, removed, or changed.
+
+## Can I use filepacks from code?
+
+Yes. Install `@filepacks/core` and call:
+
+- `pack()`
+- `inspect()`
+- `verify()`
+- `compare()`
+
+## Does the public repo support typed artifacts?
+
+No. The current v0 OSS manifest validator rejects typed artifact fields such as `schema_version` and `artifact_type`.
+
+## Are directories stored as archive entries?
+
+No. The public `.fpk` format stores regular file entries only. Directory entries must not be emitted.
+
+## What Node version do I need?
+
+The CLI and core packages declare `node >=18`.

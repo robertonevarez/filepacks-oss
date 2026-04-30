@@ -1,19 +1,71 @@
-# Installation
+---
+title: Installation
+description: Install the public filepacks CLI or the @filepacks/core package.
+---
 
-Install the CLI globally:
+## Requirements
+
+- Node.js `>=18`
+- npm
+
+## Install the CLI
+
+Install the public CLI globally:
 
 ```bash
 npm install -g filepacks
 ```
 
-Or use `npx` without a global install:
+Or run it with `npx`:
 
 ```bash
 npx filepacks --help
 ```
 
-Install the core package for programmatic usage:
+The current public CLI commands are:
+
+```bash
+filepacks pack <input> --output <file>
+filepacks inspect <file>
+filepacks verify <file>
+filepacks compare <baseline> <candidate>
+```
+
+## Install the core library
+
+Install `@filepacks/core` for programmatic usage:
 
 ```bash
 npm install @filepacks/core
 ```
+
+Example:
+
+```ts
+import {pack, inspect, verify, compare} from '@filepacks/core'
+
+await pack({input: '/tmp/input', output: '/tmp/example.fpk'})
+const artifact = await inspect({artifact: '/tmp/example.fpk'})
+const verification = await verify({artifact: '/tmp/example.fpk'})
+const diff = await compare({
+  baseline: '/tmp/baseline.fpk',
+  candidate: '/tmp/example.fpk',
+})
+```
+
+## Verify the CLI install
+
+```bash
+filepacks --help
+```
+
+The help output should list `pack`, `inspect`, `verify`, and `compare`.
+
+## Verify the core install
+
+Your runtime should be able to import `@filepacks/core` and call `pack()`, `inspect()`, `verify()`, and `compare()`.
+
+## Notes
+
+- Artifact file paths used with `inspect`, `verify`, and `compare` must end in `.fpk`.
+- The CLI does not expose registry, tag, baseline, import, show, or unpack commands in the public OSS surface.

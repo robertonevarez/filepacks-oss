@@ -1,0 +1,105 @@
+---
+title: Concepts
+description: Core terms and ideas used by the current public filepacks OSS surface.
+---
+
+## Artifact
+
+An artifact is a deterministic `.fpk` archive representing one packaged directory of files.
+
+Key properties:
+
+- immutable once written
+- portable as a single file
+- self-describing through `manifest.json`
+- structurally comparable against another artifact
+
+## Manifest
+
+`manifest.json` is the canonical metadata document inside the archive.
+
+It is the first archive entry and includes:
+
+- `artifact_name`
+- `created_with`
+- `file_count`
+- `files[]`
+- `format_version`
+- `payload_digest`
+- `total_bytes`
+
+Each file entry records:
+
+- `path`
+- `size`
+- `hash`
+
+## Payload
+
+Payload files are stored under `payload/` inside the archive.
+
+The manifest refers to them by normalized relative path without the `payload/` prefix.
+
+Example:
+
+- archive entry: `payload/reports/summary.txt`
+- manifest path: `reports/summary.txt`
+
+## Determinism
+
+Determinism means the same logical input produces the same `.fpk` bytes.
+
+In the current implementation, that depends on:
+
+- lexical directory traversal
+- sorted manifest entries
+- fixed tar header metadata
+- stable manifest serialization
+- `manifest.json` written first
+
+## Artifact digest
+
+The current public generic artifact identity is the SHA-256 digest of the exact `.fpk` archive bytes.
+
+The CLI prints digests as `sha256:<hex>`.
+
+## Verification
+
+Verification checks whether the payload still matches the manifest.
+
+That includes:
+
+- manifest validity
+- expected payload paths
+- file sizes
+- file hashes
+- the aggregate `payload_digest`
+
+## Structural comparison
+
+Structural comparison answers a simple question: did any packaged file change?
+
+It compares two manifests and reports added, removed, and changed file paths.
+
+## CLI versus core library
+
+The CLI exposes a narrow command set.
+
+The core package exposes the same public operations programmatically:
+
+- `pack()`
+- `inspect()`
+- `verify()`
+- `compare()`
+
+`pack()` in `@filepacks/core` also accepts an optional `name` field for the artifact name. The public CLI does not currently expose a `--name` flag.
+
+## Current OSS boundary
+
+The public repo intentionally excludes:
+
+- typed artifact manifests
+- registry protocols
+- local store management
+- tags and baseline workflows
+- additional CLI commands outside `pack`, `inspect`, `verify`, and `compare`

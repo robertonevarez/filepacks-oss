@@ -1,0 +1,86 @@
+---
+title: Why filepacks
+description: Why deterministic artifact packaging is more useful than passing around loose output directories.
+---
+
+Repeated workflows usually emit plain directories. That is convenient for capture, but weak for review:
+
+- a directory has no stable artifact identity
+- verification is ad hoc
+- comparison depends on filesystem state and tool choice
+- sharing often loses the canonical context of what was packaged
+
+filepacks solves that by turning the directory into a deterministic `.fpk` archive with a canonical manifest.
+
+## The problem with loose directories
+
+Suppose a baseline run and a candidate run both produce:
+
+```text
+outputs/results.json
+outputs/summary.txt
+```
+
+Without an artifact boundary, you still have to answer:
+
+- what exactly was included in the snapshot?
+- are the files still byte-for-byte what was originally captured?
+- which files changed between runs?
+
+Those questions tend to get answered with a mix of shell tools, manual inspection, and local conventions.
+
+## What filepacks adds
+
+filepacks gives you:
+
+- a single `.fpk` file as the portable artifact boundary
+- `manifest.json` as the canonical file inventory
+- deterministic archive construction for stable bytes
+- local verification against recorded file sizes and hashes
+- structural comparison between baseline and candidate artifacts
+
+## Why determinism matters
+
+If the same logical input produces the same artifact bytes, then the artifact digest becomes a meaningful identity for the packaged output.
+
+That helps with:
+
+- reproducible review
+- baseline and candidate workflows
+- durable evidence capture in CI
+- human review grounded in concrete files
+- agent workflows that need a stable comparison primitive
+
+## Why not just use tar or zip?
+
+Generic archive tools can bundle files, but they do not define the public filepacks contract:
+
+- `manifest.json` must be first
+- payload files must live under `payload/`
+- directory entries are not allowed
+- paths must be normalized relative paths
+- tar header metadata is fixed for deterministic output
+- verification and comparison are part of the intended workflow
+
+## Why filepacks stays narrow
+
+The current OSS surface is intentionally conservative. It focuses on packaging, inspection, verification, and comparison of deterministic file evidence.
+
+It is not trying to be:
+
+- a cloud platform
+- a storage sync layer
+- a registry service
+- a general workflow engine
+- a replacement for Git
+
+## Where it fits
+
+filepacks is a good fit when you want to keep generated output reviewable and portable without introducing a larger product dependency.
+
+That includes:
+
+- agent run outputs
+- eval artifacts that are just file trees
+- CI-generated reports
+- regression bundles for baseline/candidate review

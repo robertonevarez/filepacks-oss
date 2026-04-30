@@ -1,0 +1,70 @@
+---
+title: Verify
+description: Validate that an artifact's payload matches its manifest.
+---
+
+## Usage
+
+```bash
+filepacks verify <file>
+```
+
+## What verify checks
+
+`verify` reads the artifact, validates the manifest, and checks the payload against it.
+
+That includes:
+
+- archive structure
+- manifest validity
+- expected payload paths
+- file sizes
+- file hashes
+- the aggregate `payload_digest`
+
+## Successful output
+
+```text
+Verify
+path=/absolute/path/to/artifact.fpk
+ok=true
+files_checked=2
+```
+
+## Failure output
+
+On failure, the CLI exits non-zero and prints mismatch lines such as:
+
+```text
+Verify
+path=/absolute/path/to/artifact.fpk
+ok=false
+error=hash_mismatch:Hash mismatch for: summary.txt
+```
+
+## Exit behavior
+
+- exit `0`: artifact is valid
+- exit `1`: artifact is invalid or the command was used incorrectly
+
+## Mismatch codes
+
+The current verifier can report:
+
+- `archive_malformed`
+- `digest_mismatch`
+- `hash_mismatch`
+- `manifest_invalid`
+- `missing_payload_file`
+- `size_mismatch`
+- `unexpected_payload_file`
+
+## Core API
+
+```ts
+const result = await verify({artifact: '/tmp/example.fpk'})
+
+if (!result.ok) {
+  console.log(result.mismatches)
+}
+```
