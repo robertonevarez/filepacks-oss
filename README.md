@@ -100,26 +100,35 @@ The `filepacks` CLI emits and verifies `.fpk` artifacts.
 
 ## Quickstart
 
-From a checkout:
+Install the latest version:
 
 ```bash
-npm install
-npm run build:core
-npm run test:core
-npm run test:cli
+npm install -g filepacks
 ```
 
-Create and verify a local artifact:
+Or run it without a global install:
 
 ```bash
-mkdir -p /tmp/filepacks-demo
-printf 'hello\n' > /tmp/filepacks-demo/hello.txt
-
-./packages/cli/bin/dev.js pack /tmp/filepacks-demo --output /tmp/demo.fpk
-./packages/cli/bin/dev.js inspect /tmp/demo.fpk
-./packages/cli/bin/dev.js verify /tmp/demo.fpk
-./packages/cli/bin/dev.js compare /tmp/demo.fpk /tmp/demo.fpk
+npx filepacks pack ./run --output run.fpk
 ```
+
+Core workflow:
+
+```bash
+filepacks pack ./run --output run.fpk
+filepacks inspect run.fpk
+filepacks verify run.fpk
+filepacks compare baseline.fpk candidate.fpk
+```
+
+CLI help:
+
+```bash
+filepacks --help
+```
+
+For contributors, repository setup and local package builds are still available,
+but they are not required for basic CLI usage.
 
 ## Repository Layout
 

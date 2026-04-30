@@ -66,3 +66,29 @@ test('rejects non-v0 commands', async () => {
     assert.match(result.stderr, new RegExp(`Unknown command: ${command}`))
   }
 })
+
+test('help entrypoints return stable output and exit 0', async () => {
+  const expected = [
+    'filepacks — deterministic artifact CLI',
+    '',
+    'Usage:',
+    '  filepacks <command> [options]',
+    '',
+    'Commands:',
+    '  pack       Create a .fpk artifact from a directory',
+    '  inspect    Read artifact metadata and file list',
+    '  verify     Validate artifact integrity',
+    '  compare    Show differences between two artifacts',
+    '',
+    'Example:',
+    '  filepacks pack ./run --output run.fpk',
+    '',
+  ].join('\n')
+
+  for (const args of [['--help'], ['-h'], ['help']]) {
+    const result = await run(args)
+    assert.equal(result.exitCode, 0)
+    assert.equal(result.stderr, undefined)
+    assert.equal(result.stdout, expected)
+  }
+})

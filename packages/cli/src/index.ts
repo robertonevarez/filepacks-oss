@@ -1,14 +1,9 @@
 import {
-  buildManifest,
-  collectSourceFiles,
-  compareArtifacts,
-  deriveArtifactName,
+  compare,
   FilepacksError,
-  hashFileSHA256,
-  readArtifact,
-  serializeManifest,
-  verifyArtifact,
-  writeDeterministicArchive,
+  inspect,
+  pack,
+  verify,
 } from '@filepacks/core'
 import {resolve} from 'node:path'
 
@@ -33,12 +28,13 @@ export async function run(argv: string[]): Promise<CommandResult> {
   const [command, ...rest] = argv
 
   try {
+    if (isHelpCommand(command, rest)) return ok(helpText())
     if (command === 'pack') return await packCommand(rest)
     if (command === 'inspect') return await inspectCommand(rest)
     if (command === 'verify') return await verifyCommand(rest)
     if (command === 'compare') return await compareCommand(rest)
 
-    return fail(`Unknown command: ${command ?? ''}`.trim(), usage())
+    return fail(`Unknown command: ${command ?? ''}`.trim(), "Run 'filepacks --help' for usage")
   } catch (error) {
     if (error instanceof FilepacksError) {
       return fail(error.message, error.hint)
@@ -58,30 +54,19 @@ async function packCommand(args: string[]): Promise<CommandResult> {
 
   const inputDirectory = resolve(input)
   const outputPath = resolve(flags.output)
-  const sourceFiles = await collectSourceFiles(inputDirectory)
-  const manifestFiles = await Promise.all(sourceFiles.map(async file => ({
-    hash: await hashFileSHA256(file.absolutePath),
-    path: file.relativePath,
-    size: file.size,
-  })))
-  const manifest = buildManifest(deriveArtifactName(inputDirectory), manifestFiles)
-
-  await writeDeterministicArchive({
-    files: sourceFiles,
-    manifestBytes: serializeManifest(manifest),
-    outputPath,
+  const result = await pack({
+    input: inputDirectory,
+    output: outputPath,
   })
-
-  const digest = await hashFileSHA256(outputPath)
 
   return ok([
     'Pack',
-    `input=${inputDirectory}`,
-    `output=${outputPath}`,
-    `name=${manifest.artifact_name}`,
-    `digest=sha256:${digest}`,
-    `files=${manifest.file_count}`,
-    `bytes=${manifest.total_bytes}`,
+    `input=${result.inputDirectory}`,
+    `output=${result.outputPath}`,
+    `name=${result.manifest.artifact_name}`,
+    `digest=sha256:${result.artifactDigest}`,
+    `files=${result.manifest.file_count}`,
+    `bytes=${result.manifest.total_bytes}`,
   ].join('\n') + '\n')
 }
 
@@ -89,7 +74,7 @@ async function inspectCommand(args: string[]): Promise<CommandResult> {
   if (args.length !== 1) return fail('Usage: filepacks inspect <file>')
 
   const artifactPath = resolve(args[0])
-  const artifact = await readArtifact(artifactPath)
+  const artifact = await inspect({artifact: artifactPath})
 
   return ok([
     'Inspect',
@@ -106,7 +91,7 @@ async function verifyCommand(args: string[]): Promise<CommandResult> {
   if (args.length !== 1) return fail('Usage: filepacks verify <file>')
 
   const artifactPath = resolve(args[0])
-  const result = await verifyArtifact(artifactPath)
+  const result = await verify({artifact: artifactPath})
 
   if (result.ok) {
     return ok([
@@ -133,20 +118,7 @@ async function compareCommand(args: string[]): Promise<CommandResult> {
 
   const baselinePath = resolve(args[0])
   const candidatePath = resolve(args[1])
-  const baseline = await readArtifact(baselinePath)
-  const candidate = await readArtifact(candidatePath)
-  const result = compareArtifacts({
-    left: {
-      artifactDigest: baseline.artifactDigest,
-      manifest: baseline.manifest,
-      path: baselinePath,
-    },
-    right: {
-      artifactDigest: candidate.artifactDigest,
-      manifest: candidate.manifest,
-      path: candidatePath,
-    },
-  })
+  const result = await compare({baseline: baselinePath, candidate: candidatePath})
 
   return {
     exitCode: result.ok ? 0 : 20,
@@ -202,5 +174,32 @@ function usage(): string {
     'filepacks inspect <file>',
     'filepacks verify <file>',
     'filepacks compare <baseline> <candidate>',
+  ].join('\n')
+}
+
+function isHelpCommand(command: string | undefined, rest: string[]): boolean {
+  if (command === '--help' || command === '-h' || command === 'help') {
+    return rest.length === 0
+  }
+
+  return false
+}
+
+function helpText(): string {
+  return [
+    'filepacks — deterministic artifact CLI',
+    '',
+    'Usage:',
+    '  filepacks <command> [options]',
+    '',
+    'Commands:',
+    '  pack       Create a .fpk artifact from a directory',
+    '  inspect    Read artifact metadata and file list',
+    '  verify     Validate artifact integrity',
+    '  compare    Show differences between two artifacts',
+    '',
+    'Example:',
+    '  filepacks pack ./run --output run.fpk',
+    '',
   ].join('\n')
 }

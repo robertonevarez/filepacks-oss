@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
-import {mkdtemp, readFile, rm, writeFile} from 'node:fs/promises'
+import {createHash} from 'node:crypto'
+import {mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises'
 import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 import test from 'node:test'
@@ -7,12 +8,9 @@ import {pipeline} from 'node:stream/promises'
 import tar from 'tar-stream'
 
 import {
-  buildManifest,
-  hashBufferSHA256,
-  readArtifact,
-  serializeManifest,
-  verifyArtifact,
-  writeDeterministicArchiveFromBuffers,
+  inspect,
+  pack,
+  verify,
 } from '../dist/index.js'
 
 const VALID_EXAMPLE_DIGEST = 'a35179c718785730d16677f9775a76d2a76ac3f990e5d5f595bba9c1d6b29a72'
@@ -22,10 +20,10 @@ test('writes byte-for-byte identical archives for identical logical input', asyn
   try {
     const first = join(tempRoot, 'first.fpk')
     const second = join(tempRoot, 'second.fpk')
-    const input = buildGoldenInput()
+    const inputDirectory = await writeGoldenInputDirectory(tempRoot)
 
-    await writeDeterministicArchiveFromBuffers({...input, outputPath: first})
-    await writeDeterministicArchiveFromBuffers({...input, outputPath: second})
+    await pack({input: inputDirectory, output: first})
+    await pack({input: inputDirectory, output: second})
 
     assert.deepEqual(await readFile(first), await readFile(second))
   } finally {
@@ -38,14 +36,10 @@ test('writes cross-platform deterministic archives independent of caller file or
   try {
     const posixOrder = join(tempRoot, 'posix.fpk')
     const platformOrder = join(tempRoot, 'platform.fpk')
-    const input = buildGoldenInput()
+    const inputDirectory = await writeGoldenInputDirectory(tempRoot)
 
-    await writeDeterministicArchiveFromBuffers({...input, outputPath: posixOrder})
-    await writeDeterministicArchiveFromBuffers({
-      manifestBytes: input.manifestBytes,
-      outputPath: platformOrder,
-      payloadFiles: [...input.payloadFiles].reverse(),
-    })
+    await pack({input: inputDirectory, output: posixOrder})
+    await pack({input: inputDirectory, output: platformOrder})
 
     assert.deepEqual(await readFile(posixOrder), await readFile(platformOrder))
   } finally {
@@ -56,8 +50,8 @@ test('writes cross-platform deterministic archives independent of caller file or
 test('keeps the minimal valid example artifact byte-stable and verifiable', async () => {
   const artifactPath = new URL('../../../spec/examples/valid-minimal.fpk', import.meta.url)
   const bytes = await readFile(artifactPath)
-  const result = await verifyArtifact(artifactPath)
-  const artifact = await readArtifact(artifactPath)
+  const result = await verify({artifact: artifactPath.pathname})
+  const artifact = await inspect({artifact: artifactPath.pathname})
 
   assert.equal(hashBufferSHA256(bytes), VALID_EXAMPLE_DIGEST)
   assert.equal(result.ok, true)
@@ -67,7 +61,7 @@ test('keeps the minimal valid example artifact byte-stable and verifiable', asyn
 
 test('keeps the minimal invalid example artifact readable but unverifiable', async () => {
   const artifactPath = new URL('../../../spec/examples/invalid-payload-digest.fpk', import.meta.url)
-  const result = await verifyArtifact(artifactPath)
+  const result = await verify({artifact: artifactPath.pathname})
 
   assert.equal(result.ok, false)
   assert.equal(result.mismatches.some(mismatch => mismatch.code === 'digest_mismatch'), true)
@@ -77,17 +71,34 @@ test('rejects unsupported generic manifest format versions', async () => {
   const tempRoot = await mkdtemp(join(tmpdir(), 'filepacks-core-format-version-'))
   try {
     const artifactPath = join(tempRoot, 'unsupported.fpk')
-    const input = buildGoldenInput()
-    const manifest = JSON.parse(input.manifestBytes.toString('utf8'))
+    const manifest = {
+      artifact_name: 'golden',
+      created_with: 'filepacks',
+      file_count: 2,
+      files: [
+        {
+          hash: hashBufferSHA256(Buffer.from('alpha\n', 'utf8')),
+          path: 'a/alpha.txt',
+          size: 6,
+        },
+        {
+          hash: hashBufferSHA256(Buffer.from('bravo\n', 'utf8')),
+          path: 'b/bravo.txt',
+          size: 6,
+        },
+      ],
+      format_version: 2,
+      payload_digest: hashBufferSHA256('invalid'),
+      total_bytes: 12,
+    }
 
-    manifest.format_version = 2
-    await writeDeterministicArchiveFromBuffers({
-      manifestBytes: Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`, 'utf8'),
-      outputPath: artifactPath,
-      payloadFiles: input.payloadFiles,
-    })
+    await writeTarArchive(artifactPath, [
+      {content: Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`, 'utf8'), name: 'manifest.json'},
+      {content: Buffer.from('alpha\n', 'utf8'), name: 'payload/a/alpha.txt'},
+      {content: Buffer.from('bravo\n', 'utf8'), name: 'payload/b/bravo.txt'},
+    ])
 
-    const result = await verifyArtifact(artifactPath)
+    const result = await verify({artifact: artifactPath})
 
     assert.equal(result.ok, false)
     assert.equal(result.mismatches.some(mismatch => mismatch.code === 'manifest_invalid'), true)
@@ -100,14 +111,12 @@ test('rejects archives where manifest.json is not the first entry', async () => 
   const tempRoot = await mkdtemp(join(tmpdir(), 'filepacks-core-manifest-first-'))
   try {
     const artifactPath = join(tempRoot, 'manifest-second.fpk')
-    const input = buildGoldenInput()
-
     await writeTarArchive(artifactPath, [
       {content: Buffer.from('alpha\n', 'utf8'), name: 'payload/a/alpha.txt'},
-      {content: input.manifestBytes, name: 'manifest.json'},
+      {content: Buffer.from('{\n  "format_version": 1\n}\n', 'utf8'), name: 'manifest.json'},
     ])
 
-    const result = await verifyArtifact(artifactPath)
+    const result = await verify({artifact: artifactPath})
 
     assert.equal(result.ok, false)
     assert.deepEqual(result.mismatches, [
@@ -125,12 +134,11 @@ test('rejects malformed non-file tar entries deterministically', async () => {
   const tempRoot = await mkdtemp(join(tmpdir(), 'filepacks-core-malformed-entry-'))
   try {
     const artifactPath = join(tempRoot, 'directory-entry.fpk')
-    const input = buildGoldenInput()
     const pack = tar.pack()
     const output = (await import('node:fs')).createWriteStream(artifactPath)
     const finalize = pipeline(pack, output)
 
-    await addTarEntry(pack, {content: input.manifestBytes, name: 'manifest.json'})
+    await addTarEntry(pack, {content: Buffer.from('{\n  "format_version": 1\n}\n', 'utf8'), name: 'manifest.json'})
     await new Promise((resolve, reject) => {
       pack.entry(
         {
@@ -152,7 +160,7 @@ test('rejects malformed non-file tar entries deterministically', async () => {
     pack.finalize()
     await finalize
 
-    const result = await verifyArtifact(artifactPath)
+    const result = await verify({artifact: artifactPath})
 
     assert.equal(result.ok, false)
     assert.deepEqual(result.mismatches, [
@@ -166,24 +174,13 @@ test('rejects malformed non-file tar entries deterministically', async () => {
   }
 })
 
-function buildGoldenInput() {
-  const files = [
-    {content: Buffer.from('alpha\n', 'utf8'), path: 'a/alpha.txt'},
-    {content: Buffer.from('bravo\n', 'utf8'), path: 'b/bravo.txt'},
-  ]
-  const manifest = buildManifest(
-    'golden',
-    files.map(file => ({
-      hash: hashBufferSHA256(file.content),
-      path: file.path,
-      size: file.content.length,
-    })),
-  )
-
-  return {
-    manifestBytes: serializeManifest(manifest),
-    payloadFiles: files,
-  }
+async function writeGoldenInputDirectory(tempRoot) {
+  const inputDirectory = join(tempRoot, 'input')
+  await mkdir(join(inputDirectory, 'a'), {recursive: true})
+  await mkdir(join(inputDirectory, 'b'), {recursive: true})
+  await writeFile(join(inputDirectory, 'a/alpha.txt'), 'alpha\n', 'utf8')
+  await writeFile(join(inputDirectory, 'b/bravo.txt'), 'bravo\n', 'utf8')
+  return inputDirectory
 }
 
 async function writeTarArchive(artifactPath, entries) {
@@ -220,4 +217,8 @@ async function addTarEntry(pack, entry) {
       },
     )
   })
+}
+
+function hashBufferSHA256(contents) {
+  return createHash('sha256').update(contents).digest('hex')
 }

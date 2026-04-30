@@ -5,6 +5,9 @@
   "author": "filepacks",
   "license": "Apache-2.0",
   "homepage": "https://github.com/robertonevarez/filepacks-oss/tree/main/packages/core",
+  "bugs": {
+    "url": "https://github.com/robertonevarez/filepacks-oss/issues"
+  },
   "keywords": [
     "filepacks",
     "artifacts",
