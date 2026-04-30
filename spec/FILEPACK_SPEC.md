@@ -1,4 +1,4 @@
-# Filepack `.fpk` Specification
+# filepack `.fpk` Specification
 
 Status: v0.1.0 trust anchor
 

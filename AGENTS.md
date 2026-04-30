@@ -1,6 +1,6 @@
 # Agent Instructions
 
-This is the public-safe Filepacks OSS repo.
+This is the public-safe filepacks OSS repo.
 
 Treat everything in this repo as publishable.
 

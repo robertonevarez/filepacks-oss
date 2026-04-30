@@ -6,7 +6,7 @@ Use it when you need the exact format rules behind the CLI and core package.
 
 ## Start here
 
-- [Filepack `.fpk` Specification](FILEPACK_SPEC.md): the canonical format, hashing, and determinism rules
+- [filepack `.fpk` Specification](FILEPACK_SPEC.md): the canonical format, hashing, and determinism rules
 - [Manifest v1 JSON Schema](schemas/manifest-v1.schema.json): machine-readable schema for generic manifests
 - `examples/`: minimal public example artifacts used by the test suite
 

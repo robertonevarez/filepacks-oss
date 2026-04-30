@@ -1,4 +1,4 @@
-# Filepacks
+# filepacks
 
 Artifact infrastructure for agent workflows, eval snapshots, CI evidence, and repeatable file review.
 

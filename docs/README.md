@@ -1,6 +1,6 @@
-# Filepacks Public Docs
+# filepacks Public Docs
 
-This directory is the canonical home of the public Filepacks docs site.
+This directory is the canonical home of the public filepacks docs site.
 
 It belongs to the public `filepacks-oss` repo and should only contain public-safe
 documentation, config, and assets.
