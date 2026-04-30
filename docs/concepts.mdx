@@ -59,7 +59,7 @@ In the current implementation, that depends on:
 
 ## Artifact digest
 
-The current public generic artifact identity is the SHA-256 digest of the exact `.fpk` archive bytes.
+The current public artifact identity is the SHA-256 digest of the exact `.fpk` archive bytes.
 
 The CLI prints digests as `sha256:<hex>`.
 
@@ -75,11 +75,41 @@ That includes:
 - file hashes
 - the aggregate `payload_digest`
 
+Use `verify` to confirm an artifact is intact — for example, before using it as a baseline or sharing it for review. `verify` exits `0` on success and `1` on failure.
+
 ## Structural comparison
 
 Structural comparison answers a simple question: did any packaged file change?
 
 It compares two manifests and reports added, removed, and changed file paths.
+
+Use `compare` to understand what changed between two runs. `compare` exits `0` when the artifacts are identical and `20` when they differ — an exit code that is directly usable in CI and automation.
+
+## When to use inspect vs verify
+
+- **`inspect`**: read artifact metadata without checking payload integrity. Use when you want to confirm what's in an artifact — file names, count, total size, digest.
+- **`verify`**: check that the payload still matches the manifest. Use before trusting an artifact for review or comparison, or when you suspect corruption.
+
+## Typical workflow
+
+A complete baseline-versus-candidate workflow:
+
+```bash
+# Pack the baseline (e.g., previous known-good run)
+filepacks pack ./run-prev --output ./baseline.fpk
+
+# Pack the candidate (e.g., current run)
+filepacks pack ./run-current --output ./candidate.fpk
+
+# Inspect either artifact to confirm contents
+filepacks inspect ./candidate.fpk
+
+# Verify integrity before comparison
+filepacks verify ./candidate.fpk
+
+# Compare — exits 0 if identical, 20 if different
+filepacks compare ./baseline.fpk ./candidate.fpk
+```
 
 ## CLI versus core library
 

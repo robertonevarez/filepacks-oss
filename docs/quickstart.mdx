@@ -3,13 +3,9 @@ title: Quickstart
 description: Package a directory into a .fpk artifact, inspect it, verify it, and compare it against another run.
 ---
 
-This quickstart follows the current public OSS workflow:
+This quickstart walks through the core workflow: pack a directory, inspect and verify the artifact, then compare two runs.
 
-1. Package a baseline directory with `filepacks pack`
-2. Package a candidate directory with `filepacks pack`
-3. Inspect either artifact with `filepacks inspect`
-4. Verify integrity with `filepacks verify`
-5. Compare the two artifacts with `filepacks compare`
+The same four commands apply whether you're packaging CI build output, agent run files, or eval results.
 
 ## Install the CLI
 
@@ -106,6 +102,8 @@ changed_file=summary.txt
 
 If the artifacts are identical, `compare` exits `0` with `ok=true`.
 
+In automation, you can use the exit code to gate a pipeline step: exit `0` means the run matches the baseline; exit `20` means something changed and needs review.
+
 ## What you just used
 
 - `filepacks pack <input> --output <file>`
@@ -117,6 +115,7 @@ Those four commands are the current public CLI surface.
 
 ## Next steps
 
-- Read [Why filepacks](/docs/why-filepacks) for the design goal
+- Read [Why filepacks](/docs/why-filepacks) for the design rationale
 - See [Artifacts](/docs/artifacts) for the `.fpk` format and manifest rules
 - Use the [CLI overview](/docs/cli) for command-by-command reference
+- See [CI/CD Integration](/docs/ci-cd-integration) for GitHub Actions and agent workflows

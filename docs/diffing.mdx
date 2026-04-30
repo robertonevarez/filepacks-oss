@@ -7,51 +7,44 @@ The current public `filepacks compare` command performs structural comparison on
 
 It compares the two manifests by path, size, and hash. There is no semantic comparison mode in the current public OSS CLI.
 
-## Comparison input
+## What structural comparison means
+
+Structural comparison answers one question: did any packaged file change between two runs?
+
+It classifies differences as:
+
+- **added**: a file exists in the candidate but not the baseline
+- **removed**: a file exists in the baseline but not the candidate
+- **changed**: same path in both artifacts but different `size` or `hash`
+
+The comparison is manifest-driven. No payload extraction is required — paths are already normalized, file lists are already sorted, and comparison behavior is consistent across environments.
+
+## Why manifest-based diffing is useful
+
+Ad hoc directory comparison depends on filesystem state and tool choice. Manifest-based comparison has a fixed input format, fixed comparison rules, and a stable exit code.
+
+That makes `compare` a reliable primitive for:
+
+- detecting regressions between baseline and candidate runs
+- verifying that agent or eval output did not change unexpectedly
+- gating CI jobs on structural equivalence
+- producing a diff log for human review
+
+## Usage and output
+
+See the full command reference at [CLI — Compare](/docs/cli/compare).
+
+Quick reference:
 
 ```bash
-filepacks compare <baseline> <candidate>
+filepacks compare ./baseline.fpk ./candidate.fpk
 ```
 
-Both inputs must resolve to existing `.fpk` files.
-
-## What compare checks
-
-`compare` reads the manifest from each artifact and classifies differences as:
-
-- added files
-- removed files
-- changed files
-
-A file is considered changed when either of these differ for the same path:
-
-- `size`
-- `hash`
-
-## Output shape
-
-The CLI prints a stable line-oriented summary:
-
-```text
-Compare
-baseline=/absolute/path/to/baseline.fpk
-candidate=/absolute/path/to/candidate.fpk
-ok=false
-added=0
-removed=0
-changed=1
-changed_file=summary.txt
-```
-
-When artifacts are identical, `ok=true` and the added, removed, and changed counts are all `0`.
-
-## Exit behavior
-
-- exit `0`: no structural differences
+- exit `0`: no differences
 - exit `20`: one or more files were added, removed, or changed
 - exit `1`: usage or file/path error
 
-## Core API result
+## Core API
 
 `@filepacks/core compare()` returns a structural result object with:
 
@@ -65,17 +58,6 @@ When artifacts are identical, `ok=true` and the added, removed, and changed coun
 - `changed[]`
 
 Each changed file includes both left and right size/hash values.
-
-## Why compare uses the manifest
-
-Manifest-based comparison keeps the review surface explicit:
-
-- no payload extraction is required
-- paths are already normalized
-- file lists are already sorted
-- comparison behavior is consistent across environments
-
-That makes `compare` a useful baseline-versus-candidate primitive for both humans and automation.
 
 ## What compare does not do
 

@@ -10,6 +10,8 @@ A `.fpk` file is a deterministic POSIX tar archive with:
 - `manifest.json` as the first entry
 - payload files stored under `payload/`
 
+The manifest records the artifact name, file count, per-file hashes and sizes, and a payload digest. That makes the artifact self-describing and locally verifiable without unpacking.
+
 ## What commands are publicly supported?
 
 The public CLI supports only:
@@ -18,6 +20,15 @@ The public CLI supports only:
 - `filepacks inspect <file>`
 - `filepacks verify <file>`
 - `filepacks compare <baseline> <candidate>`
+
+## What should I use filepacks for in practice?
+
+filepacks works best for repeated workflows that produce a directory of output files you want to review, compare, or archive:
+
+- **CI builds**: capture a build output as a portable artifact, verify it, and compare it against the last known-good build
+- **Agent runs**: pack agent output after each run, compare to a previous run to detect unexpected changes
+- **Eval pipelines**: pack each eval run output, compare against a baseline to track regressions
+- **Portable evidence**: share a single `.fpk` file instead of a directory; the recipient can `inspect` and `verify` it locally
 
 ## Does the public CLI support tags, baselines, or registries?
 
@@ -55,6 +66,19 @@ Yes. Install `@filepacks/core` and call:
 - `inspect()`
 - `verify()`
 - `compare()`
+
+## Can an AI agent or eval runner use filepacks?
+
+Yes. The CLI and core API are simple enough to integrate directly into an agent workflow or eval harness. After a run produces output files, pack the directory:
+
+```bash
+filepacks pack ./agent-output --output ./run.fpk
+filepacks compare ./baseline.fpk ./run.fpk
+```
+
+`compare` exits `0` if nothing changed and `20` if anything did — that exit code is usable in any script or CI job.
+
+The `@filepacks/core` package exposes the same operations programmatically if you need structured results inside a harness.
 
 ## Does the public repo support typed artifacts?
 

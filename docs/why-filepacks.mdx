@@ -31,7 +31,23 @@ Those questions tend to get answered with a mix of shell tools, manual inspectio
 
 ## What filepacks adds
 
-filepacks gives you:
+filepacks gives you a consistent four-command workflow:
+
+```bash
+# Capture output as a portable artifact
+filepacks pack ./outputs --output ./run.fpk
+
+# See what's inside
+filepacks inspect ./run.fpk
+
+# Confirm the payload matches the manifest
+filepacks verify ./run.fpk
+
+# Compare this run against a previous one
+filepacks compare ./baseline.fpk ./run.fpk
+```
+
+That workflow gives you:
 
 - a single `.fpk` file as the portable artifact boundary
 - `manifest.json` as the canonical file inventory
@@ -50,6 +66,20 @@ That helps with:
 - durable evidence capture in CI
 - human review grounded in concrete files
 - agent workflows that need a stable comparison primitive
+
+## Agent and eval run context
+
+When an AI coding agent or eval runner produces output files, those files are often just a directory with no stable boundary. Packing them into a `.fpk` artifact makes the output portable, reviewable, and comparable:
+
+```bash
+# After an agent run produces ./agent-output/
+filepacks pack ./agent-output --output ./run-42.fpk
+
+# Compare to the last known-good run
+filepacks compare ./run-41.fpk ./run-42.fpk
+```
+
+`compare` exits `0` if nothing changed and `20` if any file was added, removed, or modified. That exit code is directly usable in automation — a CI job, a test harness, or a script that decides whether to accept the agent's output.
 
 ## Why not just use tar or zip?
 
@@ -82,5 +112,5 @@ That includes:
 
 - agent run outputs
 - eval artifacts that are just file trees
-- CI-generated reports
+- CI-generated reports and build outputs
 - regression bundles for baseline/candidate review

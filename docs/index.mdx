@@ -3,33 +3,21 @@ title: Introduction
 description: Filepacks packages output directories into deterministic .fpk artifacts that can be inspected, verified, and compared.
 ---
 
-filepacks is a narrow public OSS tool for turning a directory of files into a deterministic `.fpk` artifact.
+filepacks is a narrow OSS tool for turning a directory of files into a deterministic `.fpk` artifact — a single portable file you can inspect, verify, and compare against another run.
 
-The public surface is intentionally small:
-
-- `filepacks pack <input> --output <file>`
-- `filepacks inspect <file>`
-- `filepacks verify <file>`
-- `filepacks compare <baseline> <candidate>`
-- `@filepacks/core` exports `pack()`, `inspect()`, `verify()`, and `compare()`
+It is useful wherever you produce repeated file output and want a stable, reviewable evidence boundary: agent runs, eval outputs, CI build artifacts, regression bundles.
 
 ## What a `.fpk` artifact gives you
 
 - One stable file instead of a loose output directory
-- A canonical `manifest.json` as the first archive entry
-- Payload files under `payload/`
+- A canonical `manifest.json` as the first archive entry with full file inventory
+- Payload files stored under `payload/`
 - Deterministic archive bytes for the same logical input
 - Structural comparison based on manifest entries, not ad hoc directory diffs
 
-## Current public positioning
-
-filepacks is for packaging generated outputs and reviewing them as evidence. It is useful for agent runs, eval outputs, CI artifacts, and any repeated workflow where you want a portable baseline and candidate comparison surface.
-
-The public OSS repo does not include cloud features, registry workflows, local tag management, typed eval artifacts, or private product behavior.
-
 ## CLI and library
 
-Use the CLI when you want a conservative command-line workflow:
+Use the CLI when you want a command-line workflow:
 
 ```bash
 filepacks pack ./run --output ./run.fpk
@@ -38,7 +26,7 @@ filepacks verify ./run.fpk
 filepacks compare ./baseline.fpk ./run.fpk
 ```
 
-Use `@filepacks/core` when you want to build around the artifact format directly:
+Use `@filepacks/core` when you want to build around the artifact format from code:
 
 ```ts
 import {pack, inspect, verify, compare} from '@filepacks/core'
@@ -52,26 +40,20 @@ const diff = await compare({
 })
 ```
 
-## What the current CLI actually does
+## Public OSS surface
 
-- `pack` requires one input directory and `--output <file>`
-- `inspect` reads artifact metadata from an existing `.fpk` file
-- `verify` checks the payload against the manifest and exits non-zero on mismatches
-- `compare` performs structural comparison only and exits `20` when artifacts differ
+The public CLI and library include:
 
-## What filepacks does not document here
+- `pack` — create a deterministic `.fpk` artifact from a directory
+- `inspect` — read artifact metadata from a `.fpk` file
+- `verify` — check the payload against the manifest, exit non-zero on mismatches
+- `compare` — structural comparison of two artifacts, exit `20` when they differ
 
-These areas are explicitly outside the current public OSS surface:
-
-- registry protocols and registry-compatible services
-- local store, tags, aliases, and baseline management
-- `show`, `list`, `import`, `registry`, `unpack`, and `config` commands
-- typed `eval_run` manifests and semantic comparison modes
-- private or hosted product workflows
+The public OSS surface does not include registry workflows, local store management, tags, typed eval manifests, or hosted product behavior.
 
 ## Next steps
 
 - Start with [Quickstart](/docs/quickstart)
-- Read [Why filepacks](/docs/why-filepacks)
+- Read [Why filepacks](/docs/why-filepacks) for the design rationale
 - Learn the `.fpk` rules in [Artifacts](/docs/artifacts)
 - Use the [CLI reference](/docs/cli)
