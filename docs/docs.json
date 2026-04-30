@@ -4,13 +4,13 @@
   "theme": "mint",
   "description": "filepacks creates portable, inspectable artifacts for agent workflows, evals, and regression comparisons.",
   "logo": {
-    "dark": "public/logo-dark.svg",
-    "light": "public/logo-light.svg",
+    "dark": "/public/logo-dark.svg",
+    "light": "/public/logo-light.svg",
     "href": "https://www.filepacks.com/"
   },
   "favicon": {
-    "light": "public/favicon.svg",
-    "dark": "public/favicon-dark.svg"
+    "light": "/public/favicon.svg",
+    "dark": "/public/favicon-dark.svg"
   },
   "colors": {
     "primary": "#000000",
