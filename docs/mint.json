@@ -20,13 +20,13 @@
   },
   "topbarCtaButton": {
     "name": "Get Started",
-    "url": "https://github.com/anomalyco/filepacks"
+    "url": "https://github.com/robertonevarez/filepacks-oss"
   },
   "anchors": [
     {
       "name": "GitHub",
       "icon": "github",
-      "url": "https://github.com/anomalyco/filepacks"
+      "url": "https://github.com/robertonevarez/filepacks-oss"
     },
     {
       "name": "Quickstart",
@@ -75,7 +75,6 @@
     }
   ],
   "footerSocials": {
-    "github": "https://github.com/anomalyco/filepacks",
-    "twitter": "https://x.com"
+    "github": "https://github.com/robertonevarez/filepacks-oss"
   }
 }
