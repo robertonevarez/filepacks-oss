@@ -2,6 +2,10 @@
 
 Deterministic `.fpk` artifacts for portable file evidence.
 
+This repository is the public OSS package repo. It intentionally does not
+contain the marketing/docs web app, private/internal docs, proprietary examples,
+pilot artifacts, private datasets, or private development history.
+
 Filepacks v0 is intentionally narrow. It defines a stable `.fpk` artifact
 format and a small CLI/core surface for packaging files, inspecting manifests,
 verifying payload integrity, and comparing two artifacts.

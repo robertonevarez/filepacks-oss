@@ -1,9 +1,14 @@
 node_modules/
 dist/
 coverage/
+*.log
 *.tsbuildinfo
 npm-debug.log*
 .DS_Store
+.vercel/
+apps/web/.vercel/
+.next/
+apps/web/.next/
 
 .env
 .env.*
