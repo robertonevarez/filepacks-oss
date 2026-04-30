@@ -9,8 +9,8 @@
     "href": "https://www.filepacks.com/"
   },
   "favicon": {
-    "light": "/docs/images/filepacks-favicon.svg",
-    "dark": "/docs/images/filepacks-favicon-dark.svg"
+    "light": "public/favicon.svg",
+    "dark": "public/favicon-dark.svg"
   },
   "colors": {
     "primary": "#000000",
