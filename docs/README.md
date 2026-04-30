@@ -32,8 +32,10 @@ Or from the `filepacks-oss` repo root:
 npm run docs:dev
 ```
 
-The current docs config file is `mint.json`, which is the convention used in this
-repo today.
+The docs config file is `docs.json` (the current Mintlify standard).
+The deprecated `mint.json` file is retained for backwards compatibility but should
+not be edited. See https://mintlify.com/docs/settings for the latest configuration
+format.
 
 ## Relationship To `filepacks.com/docs`
 

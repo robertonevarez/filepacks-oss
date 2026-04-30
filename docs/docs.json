@@ -1,0 +1,82 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Filepacks",
+  "theme": "mint",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.ico",
+  "colors": {
+    "primary": "#0D9488",
+    "light": "#07C983",
+    "dark": "#0D9488",
+    "anchors": {
+      "from": "#0D9488",
+      "to": "#07C983"
+    }
+  },
+  "modeToggle": {
+    "default": "dark",
+    "isHidden": false
+  },
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://github.com/robertonevarez/filepacks-oss"
+  },
+  "anchors": [
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/robertonevarez/filepacks-oss"
+    },
+    {
+      "name": "Quickstart",
+      "icon": "book",
+      "url": "/quickstart"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Introduction",
+      "pages": [
+        "index",
+        "quickstart",
+        "installation",
+        "why-filepacks",
+        "concepts",
+        "diffing"
+      ]
+    },
+    {
+      "group": "Artifacts",
+      "pages": [
+        "artifacts",
+        "artifacts/format",
+        "artifacts/manifest",
+        "artifacts/determinism"
+      ]
+    },
+    {
+      "group": "CLI",
+      "pages": [
+        "cli",
+        "cli/pack",
+        "cli/inspect",
+        "cli/verify",
+        "cli/compare"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "ci-cd-integration",
+        "faq",
+        "troubleshooting"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/robertonevarez/filepacks-oss"
+  }
+}
