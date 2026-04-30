@@ -1,0 +1,71 @@
+---
+title: Use cases
+description: Practical ways to use filepacks for evals, agent runs, CI evidence, review handoff, and regression comparison.
+---
+
+filepacks is most useful when a workflow already produces files and you need those files to be easier to trust, review, compare, or hand off.
+
+## Common use cases
+
+| Scenario | Input directory | Why filepacks helps | Typical commands |
+| --- | --- | --- | --- |
+| AI eval result snapshots | `./eval-output` | Turns each run into one deterministic artifact you can compare to an accepted baseline | `pack`, `verify`, `compare` |
+| Agent run artifacts | `./agent-output` | Creates a portable record that another human or agent can inspect later | `pack`, `inspect`, `verify` |
+| Regression comparisons | `./run-prev`, `./run-current` | Gives a fixed structural diff instead of ad hoc directory comparisons | `pack`, `compare` |
+| CI evidence | `./build-output`, `./reports` | Preserves the exact generated files from a job for later review | `pack`, `verify`, `compare` |
+| Prompt or model output comparisons | `./model-a`, `./model-b` | Compares generated files across prompts, models, or configurations | `pack`, `compare` |
+| Human review of generated output | any generated directory | Produces one artifact with a canonical manifest and stable digest | `pack`, `inspect`, `verify` |
+| Portable artifact handoff | a run output directory | Makes review independent of the original machine or workspace layout | `pack`, `inspect` |
+
+## Eval snapshot pattern
+
+When each eval run emits files, package each run immediately:
+
+```bash
+filepacks pack ./eval-output --output ./eval-run-42.fpk
+filepacks verify ./eval-run-42.fpk
+filepacks compare ./eval-baseline.fpk ./eval-run-42.fpk
+```
+
+If `compare` exits `20`, the run changed structurally and needs review.
+
+## Agent run handoff
+
+When an agent finishes producing files:
+
+```bash
+filepacks pack ./agent-output --output ./agent-run-17.fpk
+filepacks inspect ./agent-run-17.fpk
+filepacks verify ./agent-run-17.fpk
+```
+
+Now the artifact can be uploaded, attached to a ticket, or handed to another reviewer without relying on the original workspace.
+
+## Human review workflow
+
+A simple human review loop is:
+
+1. `inspect` to confirm the artifact identity and scale.
+2. `verify` before trusting the artifact.
+3. `compare` against the previous accepted artifact.
+4. Review the reported changed paths in the original files or your own tooling.
+
+## What filepacks is especially good at
+
+filepacks works best when:
+
+- your workflow already produces files
+- you want a deterministic artifact boundary
+- you need human-readable review plus automation-friendly exit codes
+- you want to preserve evidence locally or in CI without a hosted dependency
+
+## When it is not the right tool
+
+filepacks is not a replacement for:
+
+- Git history and source review
+- a registry or artifact store
+- semantic eval scoring
+- cloud dashboards or workflow orchestration
+
+Use [Why filepacks](/why-filepacks) for the conceptual framing and [Agent workflows](/agent-workflows) for agent-specific patterns.

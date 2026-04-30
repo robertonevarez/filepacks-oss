@@ -1,13 +1,26 @@
 ---
 title: Verify
-description: Validate that an artifact's payload matches its manifest.
+description: Validate that an artifact still matches its manifest before you trust or compare it.
 ---
+
+## What it does
+
+`verify` checks whether the payload inside the `.fpk` file still matches the manifest.
+
+Use it before you upload an artifact, hand it to someone else, or use it as a baseline.
 
 ## Usage
 
 ```bash
 filepacks verify <file>
 ```
+
+## When to use it
+
+- before treating an artifact as evidence
+- before comparing against another artifact
+- when you suspect corruption or malformed input
+- when you received the artifact from somewhere else
 
 ## What verify checks
 
@@ -22,7 +35,15 @@ That includes:
 - file hashes
 - the aggregate `payload_digest`
 
-## Successful output
+## Minimal example
+
+```bash
+filepacks verify ./artifact.fpk
+```
+
+## Expected output shape
+
+Successful output:
 
 ```text
 Verify
@@ -31,7 +52,7 @@ ok=true
 files_checked=2
 ```
 
-## Failure output
+Failure output:
 
 On failure, the CLI exits non-zero and prints mismatch lines such as:
 
@@ -47,7 +68,7 @@ error=hash_mismatch:Hash mismatch for: summary.txt
 - exit `0`: artifact is valid
 - exit `1`: artifact is invalid or the command was used incorrectly
 
-## Mismatch codes
+## Common mismatch codes
 
 The current verifier can report:
 
@@ -58,6 +79,18 @@ The current verifier can report:
 - `missing_payload_file`
 - `size_mismatch`
 - `unexpected_payload_file`
+
+## Common mistakes
+
+- skipping `verify` and assuming `inspect` is enough
+- treating `ok=false` as a semantic judgment instead of an integrity failure
+- comparing against an artifact that has never been verified
+
+## Related commands
+
+- `inspect` for a quick summary
+- `compare` after integrity has been confirmed
+- `pack` to recreate a trusted artifact from the original directory
 
 ## Core API
 

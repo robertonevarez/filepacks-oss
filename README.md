@@ -1,49 +1,10 @@
 # Filepacks
 
-Deterministic `.fpk` artifacts for portable file evidence.
+Artifact infrastructure for agent workflows, eval snapshots, CI evidence, and repeatable file review.
 
-This repository is the public OSS package repo. It intentionally does not
-contain the marketing/docs web app, private/internal docs, proprietary examples,
-pilot artifacts, private datasets, or private development history.
+filepacks turns a directory of generated files into a deterministic `.fpk` artifact that you can inspect, verify, compare, and hand off as durable evidence.
 
-Filepacks v0 is intentionally narrow. It defines a stable `.fpk` artifact
-format and a small CLI/core surface for packaging files, inspecting manifests,
-verifying payload integrity, and comparing two artifacts.
-
-```txt
-Input directory
-        ↓
-    Filepacks CLI
-        ↓
-      .fpk
-        ↓
-inspect / verify / compare
-```
-
-## v0 OSS Scope
-
-Included in v0:
-
-- `.fpk` artifact format and validation rules
-- Core pack logic
-- Core inspect logic
-- Core verify logic
-- Core compare logic
-- Shared manifest, file, and diff types
-
-Excluded in v0:
-
-- Cloud features
-- Remote registry, storage, or sync
-- Local store abstractions unless they are part of the stable CLI core
-- Unstable tagging or aliasing
-- Auth, workspaces, or multi-user features
-- Experimental or internal-only commands
-- Internal fixtures, private eval data, or proprietary examples
-
-## Initial CLI Surface
-
-The initial public CLI command surface is frozen as:
+The public OSS surface is intentionally small:
 
 ```bash
 filepacks pack <input> --output <file>
@@ -52,55 +13,41 @@ filepacks verify <file>
 filepacks compare <baseline> <candidate>
 ```
 
-Commands such as `show`, `list`, `tag`, `unpack`, registry commands, import
-adapters, baseline workflows, and other internal or experimental commands are
-not part of the v0 OSS surface.
+## Why it exists
 
-Deferred commands are quarantined outside this export. The v0 CLI package does
-not bundle registry, local store, tag, alias, typed eval/import, history, event,
-show, list, or unpack logic.
+Loose output directories are easy to create but awkward to trust. They have no stable identity, no canonical manifest, and no built-in verification step.
 
-## What Filepacks Provides
+filepacks adds:
 
-- Deterministic `.fpk` artifacts for file evidence
-- Manifest-first inspection without unpacking payload files
-- Local verification of paths, sizes, hashes, and payload contents
-- Structural comparison for two `.fpk` artifacts
-- Shared manifest, file, and diff types for the core artifact path
+- **one portable file** instead of a loose directory tree
+- **a canonical `manifest.json`** with file paths, sizes, and hashes
+- **deterministic archive bytes** for the same logical input
+- **local verification** before review or handoff
+- **structural comparison** for baseline-versus-candidate workflows
 
-## Non-Goals
+## Good fit
 
-filepacks v0 is not:
+filepacks works well when you want:
 
-- An artifact registry
-- A storage or sync service
-- An MLOps platform
-- A workflow engine
-- A replacement for Git or dataset versioning
-- A cloud platform
+- agent run outputs captured as portable artifacts
+- eval result snapshots compared across runs
+- CI-generated reports preserved for human review
+- prompt or model output directories compared structurally
+- a deterministic artifact boundary that humans and automation can both use
 
-## Stability / v0 Contract
+## Not in the v0 OSS surface
 
-- The `.fpk` artifact format is intended to remain stable starting with v0.1.0.
-- Backward compatibility for valid `.fpk` artifacts is a priority.
-- CLI and programmatic APIs may change before v1.0.
-- Determinism is a core guarantee: the same logical input should produce the
-  same artifact bytes, subject to the documented spec.
+This repository does **not** include:
 
-## CLI
-
-The `filepacks` CLI emits and verifies `.fpk` artifacts.
-
-| Command area | Evidence-bundle role |
-| --- | --- |
-| `pack` | Capture a directory of files as a deterministic `.fpk` artifact. |
-| `verify` | Validate artifact integrity before review or sharing. |
-| `inspect` | Summarize an artifact for quick human review. |
-| `compare` | Compare baseline and candidate artifacts to understand what changed. |
+- registries, remote storage, or sync
+- tags, aliases, or baseline resolution
+- typed eval artifacts
+- hosted product behavior
+- cloud dashboards or workflow orchestration
 
 ## Quickstart
 
-Install the latest version:
+Install the CLI:
 
 ```bash
 npm install -g filepacks
@@ -109,46 +56,44 @@ npm install -g filepacks
 Or run it without a global install:
 
 ```bash
-npx filepacks pack ./run --output run.fpk
+npx filepacks --help
 ```
 
 Core workflow:
 
 ```bash
-filepacks pack ./run --output run.fpk
-filepacks inspect run.fpk
-filepacks verify run.fpk
-filepacks compare baseline.fpk candidate.fpk
+filepacks pack ./run-output --output ./run.fpk
+filepacks inspect ./run.fpk
+filepacks verify ./run.fpk
+filepacks compare ./baseline.fpk ./run.fpk
 ```
 
-CLI help:
+## Packages
 
-```bash
-filepacks --help
-```
+| Package | Purpose |
+| --- | --- |
+| `filepacks` | CLI for packaging, inspection, verification, and comparison |
+| `@filepacks/core` | Programmatic API for the same artifact operations |
 
-For contributors, repository setup and local package builds are still available,
-but they are not required for basic CLI usage.
+## Docs map
 
-## Repository Layout
+- [Quickstart](docs/quickstart.mdx)
+- [CLI workflows](docs/cli/workflows.mdx)
+- [Use cases](docs/use-cases.mdx)
+- [Agent workflows](docs/agent-workflows.mdx)
+- [Artifact reference](docs/artifacts/index.mdx)
+- [Specification](spec/FILEPACK_SPEC.md)
 
-- `packages/core`: reusable `.fpk` artifact primitives and shared types.
-- `packages/cli`: conservative v0 CLI wrapper for the stable core commands.
-- `spec`: public `.fpk` artifact format documentation and validation rules.
+## Repository layout
 
-## `.fpk` Format
+- `docs/`: Mintlify docs site content and configuration
+- `packages/core`: reusable artifact primitives and shared types
+- `packages/cli`: conservative wrapper around the public CLI commands
+- `spec`: public `.fpk` specification, schema, and example artifacts
 
-A `.fpk` file is a POSIX tar archive with a deterministic structure:
+## Stability
 
-```txt
-manifest.json
-payload/
-  <files...>
-```
-
-`manifest.json` is the canonical metadata document. Payload files are stored
-under `payload/` with normalized relative paths. Creation uses lexical
-traversal, sorted manifest entries, and normalized tar headers so the same
-input produces identical artifact bytes.
-
-See the public format specification in `spec/`.
+- The `.fpk` artifact format is intended to remain stable starting with v0.1.0.
+- Backward compatibility for valid `.fpk` artifacts is a priority.
+- CLI and programmatic APIs may evolve before v1.0.
+- Determinism is a core guarantee: the same logical input should produce the same artifact bytes, subject to the published spec.

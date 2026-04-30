@@ -1,6 +1,6 @@
 ---
 title: FAQ
-description: Common questions about the current public filepacks OSS surface.
+description: Common questions about what filepacks does, where it fits, and how to use the current OSS surface well.
 ---
 
 ## What is a `.fpk` file?
@@ -11,6 +11,18 @@ A `.fpk` file is a deterministic POSIX tar archive with:
 - payload files stored under `payload/`
 
 The manifest records the artifact name, file count, per-file hashes and sizes, and a payload digest. That makes the artifact self-describing and locally verifiable without unpacking.
+
+## Why would I use filepacks instead of keeping the directory?
+
+Use filepacks when the directory needs a stable, portable review boundary.
+
+A `.fpk` file gives you:
+
+- one file instead of a loose tree
+- a canonical manifest
+- deterministic archive bytes
+- local verification
+- structural comparison against another run
 
 ## What commands are publicly supported?
 
@@ -29,6 +41,15 @@ filepacks works best for repeated workflows that produce a directory of output f
 - **Agent runs**: pack agent output after each run, compare to a previous run to detect unexpected changes
 - **Eval pipelines**: pack each eval run output, compare against a baseline to track regressions
 - **Portable evidence**: share a single `.fpk` file instead of a directory; the recipient can `inspect` and `verify` it locally
+
+## Is filepacks only for humans, or can automation use it too?
+
+Both. Humans can read the summary output and review the changed paths. Automation can use:
+
+- deterministic artifact files
+- `verify` success or failure
+- `compare` exit `0` vs `20`
+- `@filepacks/core` structured results
 
 ## Does the public CLI support tags, baselines, or registries?
 
@@ -58,6 +79,10 @@ filepacks compare ./baseline.fpk ./candidate.fpk
 
 The command exits `0` if they are structurally identical and `20` if files were added, removed, or changed.
 
+## Does compare tell me whether the change is good?
+
+No. `compare` is structural only. It tells you that packaged files changed, not whether the change is correct or desirable.
+
 ## Can I use filepacks from code?
 
 Yes. Install `@filepacks/core` and call:
@@ -79,6 +104,12 @@ filepacks compare ./baseline.fpk ./run.fpk
 `compare` exits `0` if nothing changed and `20` if anything did — that exit code is usable in any script or CI job.
 
 The `@filepacks/core` package exposes the same operations programmatically if you need structured results inside a harness.
+
+## What does verification prove?
+
+`verify` proves that the artifact payload still matches the manifest.
+
+It does not prove that the files are semantically correct, only that the artifact is internally consistent and intact.
 
 ## Does the public repo support typed artifacts?
 

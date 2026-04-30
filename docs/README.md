@@ -32,10 +32,26 @@ Or from the `filepacks-oss` repo root:
 npm run docs:dev
 ```
 
-The docs config file is `docs.json` (the current Mintlify standard).
-The deprecated `mint.json` file is retained for backwards compatibility but should
-not be edited. See https://mintlify.com/docs/settings for the latest configuration
-format.
+Validation commands:
+
+From `filepacks-oss/docs`:
+
+```bash
+mint validate
+mint broken-links
+```
+
+Or from the repo root:
+
+```bash
+npm run docs:validate
+npm run docs:links
+```
+
+The docs config file is `docs.json`.
+
+Internal docs links in MDX should use root-relative docs paths such as `/quickstart`
+and `/cli/compare`, not `/docs/quickstart`.
 
 ## Relationship To `filepacks.com/docs`
 

@@ -1,6 +1,6 @@
 ---
 title: Concepts
-description: Core terms and ideas used by the current public filepacks OSS surface.
+description: Core filepacks terms, what they mean in practice, and how they fit into the four-command workflow.
 ---
 
 ## Artifact
@@ -13,6 +13,8 @@ Key properties:
 - portable as a single file
 - self-describing through `manifest.json`
 - structurally comparable against another artifact
+
+In practice, an artifact is the review boundary you hand to a teammate, upload from CI, or compare against a previous run.
 
 ## Manifest
 
@@ -33,6 +35,8 @@ Each file entry records:
 - `path`
 - `size`
 - `hash`
+
+The manifest is what `inspect`, `verify`, and `compare` reason about. It is the source of truth for what the artifact claims to contain.
 
 ## Payload
 
@@ -57,11 +61,16 @@ In the current implementation, that depends on:
 - stable manifest serialization
 - `manifest.json` written first
 
-## Artifact digest
+## Archive digest and payload digest
 
-The current public artifact identity is the SHA-256 digest of the exact `.fpk` archive bytes.
+Two digests matter:
 
-The CLI prints digests as `sha256:<hex>`.
+| Digest | Meaning | Where you see it |
+| --- | --- | --- |
+| archive digest | SHA-256 of the exact `.fpk` bytes | CLI `pack` and `inspect` output as `digest=sha256:<hex>` |
+| payload digest | SHA-256 over the sorted manifest file list | `manifest.json` as `payload_digest` |
+
+The archive digest identifies the artifact file itself. The payload digest proves that the manifest's file inventory still matches the payload file list.
 
 ## Verification
 
@@ -87,27 +96,30 @@ Use `compare` to understand what changed between two runs. `compare` exits `0` w
 
 ## When to use inspect vs verify
 
-- **`inspect`**: read artifact metadata without checking payload integrity. Use when you want to confirm what's in an artifact — file names, count, total size, digest.
-- **`verify`**: check that the payload still matches the manifest. Use before trusting an artifact for review or comparison, or when you suspect corruption.
+| Command | Use it when you want to... | It does not prove... |
+| --- | --- | --- |
+| `inspect` | read the artifact summary quickly | that the payload still matches the manifest |
+| `verify` | confirm the artifact is intact | that the output is semantically good or acceptable |
+| `compare` | see whether packaged files changed | why the change is good or bad |
+
+## Baseline and candidate
+
+When comparing artifacts:
+
+- **baseline** means the accepted or previously known-good artifact
+- **candidate** means the new artifact you want to review
+
+The public OSS CLI does not resolve baselines for you. You pass explicit file paths.
 
 ## Typical workflow
 
-A complete baseline-versus-candidate workflow:
+A common review loop looks like this:
 
 ```bash
-# Pack the baseline (e.g., previous known-good run)
 filepacks pack ./run-prev --output ./baseline.fpk
-
-# Pack the candidate (e.g., current run)
 filepacks pack ./run-current --output ./candidate.fpk
-
-# Inspect either artifact to confirm contents
 filepacks inspect ./candidate.fpk
-
-# Verify integrity before comparison
 filepacks verify ./candidate.fpk
-
-# Compare — exits 0 if identical, 20 if different
 filepacks compare ./baseline.fpk ./candidate.fpk
 ```
 
@@ -133,3 +145,5 @@ The public repo intentionally excludes:
 - local store management
 - tags and baseline workflows
 - additional CLI commands outside `pack`, `inspect`, `verify`, and `compare`
+
+For format-level detail, continue to [Artifacts](/artifacts). For practical command patterns, use [CLI workflows](/cli/workflows).

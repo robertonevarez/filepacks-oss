@@ -1,7 +1,13 @@
 ---
 title: Inspect
-description: Read artifact metadata from an existing .fpk file.
+description: Read the summary metadata from an existing .fpk artifact.
 ---
+
+## What it does
+
+`inspect` reads an artifact and prints a compact summary derived from its manifest.
+
+Use it when you want a quick read on what an artifact claims to contain before deciding whether to verify or compare it.
 
 ## Usage
 
@@ -9,15 +15,25 @@ description: Read artifact metadata from an existing .fpk file.
 filepacks inspect <file>
 ```
 
+## When to use it
+
+- after `pack` to confirm the resulting artifact
+- when someone hands you a `.fpk` file
+- before `verify` or `compare`, when you want to confirm name, version, digest, size, and file count
+
 ## Arguments
 
 - `<file>`: path to an existing `.fpk` artifact
 
 The current CLI requires the path to end in `.fpk`.
 
-## What inspect does
+## Minimal example
 
-`inspect` reads the artifact and prints a metadata summary derived from the manifest.
+```bash
+filepacks inspect ./artifact.fpk
+```
+
+## Expected output shape
 
 Example output:
 
@@ -31,11 +47,26 @@ files=2
 bytes=12
 ```
 
-## Notes
+## What it tells you
 
-- the CLI summary does not currently print the per-file list
-- `@filepacks/core inspect()` returns the parsed manifest and payload file entries programmatically
-- invalid or malformed artifacts are rejected before a summary is produced
+- artifact path
+- artifact name
+- manifest format version
+- archive digest
+- file count
+- total bytes
+
+## Common mistakes
+
+- using `inspect` when you actually need integrity guarantees; use `verify` for that
+- passing a path that does not end in `.fpk`
+- assuming the CLI prints the full per-file list; the summary is intentionally compact
+
+## Related commands
+
+- `pack` to create the artifact
+- `verify` to confirm the payload still matches the manifest
+- `compare` to see whether another artifact differs
 
 ## Core API
 

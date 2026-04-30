@@ -10,6 +10,8 @@
     "build:core": "npm run build -w @filepacks/core",
     "build:cli": "npm run build -w filepacks",
     "docs:dev": "cd docs && mint dev --port 3001",
+    "docs:validate": "npm_config_yes=true npx -p node@22 -c 'cd docs && mint validate'",
+    "docs:links": "npm_config_yes=true npx -p node@22 -c 'cd docs && mint broken-links'",
     "test": "npm run test:core && npm run test:cli",
     "test:core": "npm run test -w @filepacks/core",
     "test:cli": "npm run test -w filepacks"

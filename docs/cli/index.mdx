@@ -1,6 +1,6 @@
 ---
 title: Overview
-description: The current public CLI surface and how it maps to the core library.
+description: The four public CLI commands, when to use each one, and how the CLI maps to @filepacks/core.
 ---
 
 The current public CLI is intentionally narrow.
@@ -16,13 +16,22 @@ filepacks compare <baseline> <candidate>
 
 Unsupported commands are not part of the public OSS surface, including `show`, `import`, `registry`, `list`, `tag`, `baseline`, `unpack`, and `config`.
 
+## Choose the right command
+
+| If you want to... | Run |
+| --- | --- |
+| package a directory as one artifact | `filepacks pack <input> --output <file>` |
+| read the artifact summary | `filepacks inspect <file>` |
+| confirm the artifact is intact | `filepacks verify <file>` |
+| see whether packaged files changed | `filepacks compare <baseline> <candidate>` |
+
 ## Global help
 
 ```bash
 filepacks --help
 ```
 
-The current help output lists the four supported commands and a single pack example.
+The current help output lists the four supported commands and a single `pack` example.
 
 ## Command behavior summary
 
@@ -35,7 +44,7 @@ The current help output lists the four supported commands and a single pack exam
 
 ## Output style
 
-The CLI uses line-oriented plain text output rather than JSON.
+The CLI uses line-oriented plain text output rather than JSON. That makes it easy to read in a terminal and easy to consume from shell scripts.
 
 Examples:
 
@@ -43,6 +52,17 @@ Examples:
 - `inspect` prints `path=`, `name=`, `version=`, `digest=`, `files=`, `bytes=`
 - `verify` prints `ok=true` or `ok=false`
 - `compare` prints `ok=`, summary counts, and per-file change lines
+
+## Recommended flow
+
+Most users start here:
+
+1. `pack` the output directory.
+2. `inspect` the resulting artifact.
+3. `verify` it before trusting or sharing it.
+4. `compare` it against a baseline when you care about repeated-run drift.
+
+Use [CLI workflows](/cli/workflows) for end-to-end patterns.
 
 ## Core library mapping
 

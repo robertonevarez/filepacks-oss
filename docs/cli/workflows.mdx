@@ -1,0 +1,99 @@
+---
+title: CLI workflows
+description: Practical command patterns for first-time use, review loops, CI jobs, and repeated artifact comparisons.
+---
+
+Use this page when you know the four commands already and want repeatable ways to combine them.
+
+## Workflow: create the first useful artifact
+
+```bash
+filepacks pack ./run-output --output ./run-output.fpk
+filepacks inspect ./run-output.fpk
+```
+
+Use this when you want fast confirmation that:
+
+- the output directory is packageable
+- the artifact was created successfully
+- the resulting file count and byte count look reasonable
+
+## Workflow: trust but verify
+
+If an artifact is going to be uploaded, shared, or used as a baseline, verify it first:
+
+```bash
+filepacks verify ./run-output.fpk
+```
+
+Use this before:
+
+- attaching the artifact to a ticket or pull request
+- comparing against another artifact
+- storing the artifact as an accepted baseline
+
+## Workflow: baseline vs candidate review
+
+```bash
+filepacks compare ./baseline.fpk ./candidate.fpk
+```
+
+This is the core review loop for repeated runs:
+
+- `0` means no packaged files changed
+- `20` means one or more packaged files changed
+- `1` means command or artifact failure
+
+## Workflow: received artifact from someone else
+
+When someone hands you a `.fpk` file:
+
+```bash
+filepacks inspect ./received.fpk
+filepacks verify ./received.fpk
+```
+
+`inspect` tells you what it claims to be. `verify` tells you whether the payload still matches the manifest.
+
+## Workflow: accept a new baseline
+
+The public OSS CLI does not manage baseline aliases or tags. If the candidate is acceptable, update your baseline explicitly in your own storage or workflow.
+
+For example:
+
+```bash
+cp ./candidate.fpk ./baseline.fpk
+```
+
+Or upload the accepted candidate artifact to the location your CI jobs already use as the baseline source.
+
+## Workflow: use from a shell script
+
+```bash
+set +e
+filepacks compare ./baseline.fpk ./candidate.fpk
+status=$?
+set -e
+
+if [ "$status" -eq 0 ]; then
+  echo "No structural changes"
+elif [ "$status" -eq 20 ]; then
+  echo "Changes detected; review candidate artifact"
+else
+  echo "Comparison failed"
+  exit "$status"
+fi
+```
+
+Treat `20` as “artifact changed”, not “tool crashed”.
+
+## Workflow: choose the right command
+
+| Goal | Command |
+| --- | --- |
+| Create an artifact from a directory | `pack` |
+| Read the artifact summary | `inspect` |
+| Confirm the artifact is intact | `verify` |
+| Check whether packaged files changed | `compare` |
+
+Continue to the individual command pages for argument and output details.

@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Install the public filepacks CLI or the @filepacks/core package.
+description: Install filepacks for command-line use or add @filepacks/core to your own tooling.
 ---
 
 ## Requirements
@@ -8,21 +8,28 @@ description: Install the public filepacks CLI or the @filepacks/core package.
 - Node.js `>=18`
 - npm
 
+## Choose the interface
+
+| Use this when you want to... | Install |
+| --- | --- |
+| Pack, inspect, verify, and compare artifacts from the shell | `filepacks` CLI |
+| Call the same operations from a Node.js tool or harness | `@filepacks/core` |
+
 ## Install the CLI
 
-Install the public CLI globally:
+Install globally if you expect to use the command often:
 
 ```bash
 npm install -g filepacks
 ```
 
-Or run it with `npx`:
+Or use `npx` when you do not want a global install:
 
 ```bash
 npx filepacks --help
 ```
 
-The current public CLI commands are:
+Current public commands:
 
 ```bash
 filepacks pack <input> --output <file>
@@ -33,13 +40,13 @@ filepacks compare <baseline> <candidate>
 
 ## Install the core library
 
-Install `@filepacks/core` for programmatic usage:
+Install `@filepacks/core` when you want structured results in code:
 
 ```bash
 npm install @filepacks/core
 ```
 
-Example:
+Minimal example:
 
 ```ts
 import {pack, inspect, verify, compare} from '@filepacks/core'
@@ -65,7 +72,19 @@ The help output should list `pack`, `inspect`, `verify`, and `compare`.
 
 Your runtime should be able to import `@filepacks/core` and call `pack()`, `inspect()`, `verify()`, and `compare()`.
 
+## First useful command after install
+
+After installation, the fastest way to confirm the workflow is:
+
+```bash
+filepacks pack ./some-output-directory --output ./example.fpk
+filepacks inspect ./example.fpk
+```
+
+That tells you the install works and shows you the shape of the artifact you just created.
+
 ## Notes
 
 - Artifact file paths used with `inspect`, `verify`, and `compare` must end in `.fpk`.
 - The CLI does not expose registry, tag, baseline, import, show, or unpack commands in the public OSS surface.
+- The core API accepts an optional `name` field when packing. The public CLI does not currently expose a `--name` flag.

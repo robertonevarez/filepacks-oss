@@ -1,6 +1,6 @@
 ---
 title: Determinism
-description: How the current public implementation produces byte-for-byte stable .fpk artifacts.
+description: Why filepacks artifacts are byte-stable and why that matters for review, CI, and agent workflows.
 ---
 
 Determinism is a core guarantee of the current public format.
@@ -19,6 +19,15 @@ The public core package achieves deterministic output through:
 - stable manifest serialization
 - `manifest.json` written first
 
+## Why deterministic bytes matter
+
+Deterministic output makes the archive digest meaningful. That matters when you want to:
+
+- identify an artifact by hash
+- compare repeated runs without ambiguous packaging differences
+- preserve CI or agent evidence in a form another machine can trust later
+- prove that two producers emitted the same artifact for the same logical input
+
 ## Tar header canonicalization
 
 The current public spec fixes these tar header values for every archive entry:
@@ -32,17 +41,6 @@ The current public spec fixes these tar header values for every archive entry:
 | `mode` | `0644` |
 | `mtime` | Unix epoch |
 | `type` | regular file |
-
-## Why this matters
-
-Stable bytes make the archive digest meaningful.
-
-That helps with:
-
-- reproducible review
-- consistent verification
-- artifact deduplication by digest
-- baseline-versus-candidate comparisons grounded in a stable artifact identity
 
 ## Test coverage
 
@@ -63,3 +61,7 @@ Determinism would be broken by behavior such as:
 - writing payload entries in a non-canonical order
 
 Those behaviors are intentionally excluded from the current public format.
+
+## Practical takeaway
+
+If two `.fpk` artifacts have the same archive digest, they are byte-for-byte identical. If they differ, `compare` will tell you whether the packaged file inventory changed structurally.

@@ -1,9 +1,13 @@
 ---
 title: Troubleshooting
-description: Common public OSS filepacks errors and what they mean.
+description: Common filepacks problems, what they mean, and how to recover quickly.
 ---
 
-## `Input path does not exist`
+Use this page when a command exits unexpectedly or an artifact does not behave the way you expect.
+
+## Pack problems
+
+### `Input path does not exist`
 
 Cause: `filepacks pack` was given a directory path that does not exist.
 
@@ -14,13 +18,13 @@ ls ./your-input-directory
 filepacks pack ./your-input-directory --output ./artifact.fpk
 ```
 
-## `Input path is not a directory`
+### `Input path is not a directory`
 
 Cause: `pack` only accepts a directory as input.
 
 Fix: pass a directory, not a single file.
 
-## `Unsupported file type at:`
+### `Unsupported file type at:`
 
 Cause: the input contains a non-regular file such as a symlink, device, socket, or pipe.
 
@@ -28,13 +32,15 @@ Fix: package only regular files.
 
 The current implementation rejects non-regular file inputs.
 
-## `Artifact path must end with .fpk`
+## Inspect and verify problems
+
+### `Artifact path must end with .fpk`
 
 Cause: `inspect`, `verify`, or `compare` was given a path without the `.fpk` extension.
 
 Fix: pass a real artifact path ending in `.fpk`.
 
-## `Artifact path does not exist`
+### `Artifact path does not exist`
 
 Cause: the artifact path passed to `inspect`, `verify`, or `compare` does not exist.
 
@@ -45,19 +51,19 @@ ls ./artifact.fpk
 filepacks inspect ./artifact.fpk
 ```
 
-## `Artifact manifest.json must be the first archive entry`
+### `Artifact manifest.json must be the first archive entry`
 
 Cause: the archive does not follow the public `.fpk` format.
 
 Fix: recreate the artifact with `filepacks pack`.
 
-## `Unsupported archive entry type: directory`
+### `Unsupported archive entry type: directory`
 
 Cause: the archive contains a non-file tar entry.
 
 Fix: use a valid `.fpk` artifact. The public format allows only file entries.
 
-## `Invalid manifest.json:`
+### `Invalid manifest.json:`
 
 Cause: the manifest is malformed, unsupported, or violates the public format rules.
 
@@ -71,7 +77,7 @@ Examples include:
 
 Fix: recreate the artifact with the current public CLI or core package.
 
-## `verify` reports `ok=false`
+### `verify` reports `ok=false`
 
 Cause: payload files no longer match the manifest.
 
@@ -87,10 +93,36 @@ Mismatch codes may include:
 
 Fix: inspect the artifact source, then recreate the `.fpk` file from a trusted directory.
 
-## `compare` exits `20`
+## Compare problems
+
+### `compare` exits `20`
 
 Cause: the baseline and candidate differ structurally.
 
 This is expected when any file was added, removed, or changed.
 
 Use the printed `added_file=...`, `removed_file=...`, and `changed_file=...` lines to see what changed.
+
+### `compare` exits `1`
+
+Cause: the command could not run correctly. Common reasons are:
+
+- one of the paths does not exist
+- one of the paths does not end in `.fpk`
+- one of the artifacts is malformed
+
+Fix: verify that both paths are valid artifacts first:
+
+```bash
+filepacks verify ./baseline.fpk
+filepacks verify ./candidate.fpk
+```
+
+## A good recovery order
+
+When you are unsure what failed:
+
+1. Confirm the path exists.
+2. Run `inspect` for a quick summary.
+3. Run `verify` to confirm integrity.
+4. Only then run `compare`.

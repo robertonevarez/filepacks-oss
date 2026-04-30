@@ -1,16 +1,16 @@
 ---
 title: Why filepacks
-description: Why deterministic artifact packaging is more useful than passing around loose output directories.
+description: Why deterministic artifacts are easier to review, compare, and trust than loose output directories.
 ---
 
-Repeated workflows usually emit plain directories. That is convenient for capture, but weak for review:
+Repeated workflows usually emit plain directories. That is easy to produce, but awkward to trust:
 
 - a directory has no stable artifact identity
-- verification is ad hoc
-- comparison depends on filesystem state and tool choice
-- sharing often loses the canonical context of what was packaged
+- verification is improvised
+- comparison depends on whatever diff tool you reach for
+- handoff often loses the exact context of what was packaged
 
-filepacks solves that by turning the directory into a deterministic `.fpk` archive with a canonical manifest.
+filepacks fixes that by turning the directory into a deterministic `.fpk` archive with a canonical manifest.
 
 ## The problem with loose directories
 
@@ -27,23 +27,16 @@ Without an artifact boundary, you still have to answer:
 - are the files still byte-for-byte what was originally captured?
 - which files changed between runs?
 
-Those questions tend to get answered with a mix of shell tools, manual inspection, and local conventions.
+Without an artifact boundary, those answers usually come from a mix of shell commands, ad hoc logs, screenshots, or local conventions.
 
 ## What filepacks adds
 
-filepacks gives you a consistent four-command workflow:
+filepacks gives you one portable file and a small repeatable workflow:
 
 ```bash
-# Capture output as a portable artifact
 filepacks pack ./outputs --output ./run.fpk
-
-# See what's inside
 filepacks inspect ./run.fpk
-
-# Confirm the payload matches the manifest
 filepacks verify ./run.fpk
-
-# Compare this run against a previous one
 filepacks compare ./baseline.fpk ./run.fpk
 ```
 
@@ -57,33 +50,37 @@ That workflow gives you:
 
 ## Why determinism matters
 
-If the same logical input produces the same artifact bytes, then the artifact digest becomes a meaningful identity for the packaged output.
+If the same logical input produces the same artifact bytes, the archive digest becomes a meaningful identity for the packaged output.
 
 That helps with:
 
 - reproducible review
-- baseline and candidate workflows
+- baseline-versus-candidate workflows
 - durable evidence capture in CI
 - human review grounded in concrete files
-- agent workflows that need a stable comparison primitive
+- agent workflows that need deterministic evidence instead of ambiguous text summaries
 
-## Agent and eval run context
+## Why this helps agents and evals
 
-When an AI coding agent or eval runner produces output files, those files are often just a directory with no stable boundary. Packing them into a `.fpk` artifact makes the output portable, reviewable, and comparable:
+When an AI coding agent or eval runner produces output files, those outputs often need to survive beyond the original process. Packing them into a `.fpk` artifact makes them:
+
+- portable enough to hand to another person or agent
+- inspectable later without recreating the run
+- comparable against an accepted baseline
+- verifiable before use in review or automation
+
+Example:
 
 ```bash
-# After an agent run produces ./agent-output/
 filepacks pack ./agent-output --output ./run-42.fpk
-
-# Compare to the last known-good run
 filepacks compare ./run-41.fpk ./run-42.fpk
 ```
 
-`compare` exits `0` if nothing changed and `20` if any file was added, removed, or modified. That exit code is directly usable in automation — a CI job, a test harness, or a script that decides whether to accept the agent's output.
+`compare` exits `0` if nothing changed and `20` if any packaged file changed. That is enough for a CI job, harness, or review bot to distinguish “same output” from “needs review”.
 
-## Why not just use tar or zip?
+## Why not just use tar, zip, screenshots, or logs?
 
-Generic archive tools can bundle files, but they do not define the public filepacks contract:
+Generic tools can capture files, but they do not define the public filepacks contract:
 
 - `manifest.json` must be first
 - payload files must live under `payload/`
@@ -91,6 +88,8 @@ Generic archive tools can bundle files, but they do not define the public filepa
 - paths must be normalized relative paths
 - tar header metadata is fixed for deterministic output
 - verification and comparison are part of the intended workflow
+
+Screenshots and logs can help with explanation, but they are not a deterministic artifact format. They do not tell you exactly which files were packaged, how they hash, or whether a later copy still matches the original output.
 
 ## Why filepacks stays narrow
 
@@ -106,7 +105,7 @@ It is not trying to be:
 
 ## Where it fits
 
-filepacks is a good fit when you want to keep generated output reviewable and portable without introducing a larger product dependency.
+filepacks is a good fit when you want generated output to stay reviewable and portable without introducing a larger hosted system.
 
 That includes:
 
@@ -114,3 +113,5 @@ That includes:
 - eval artifacts that are just file trees
 - CI-generated reports and build outputs
 - regression bundles for baseline/candidate review
+
+For concrete examples, continue to [Use cases](/use-cases) and [Agent workflows](/agent-workflows).

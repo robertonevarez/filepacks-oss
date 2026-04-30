@@ -3,11 +3,24 @@ title: Compare
 description: Structurally compare two .fpk artifacts by manifest path, size, and hash.
 ---
 
+## What it does
+
+`compare` reads two artifacts and reports whether any packaged file was added, removed, or changed.
+
+It is the command to use when you care about repeated-run drift, baseline-versus-candidate review, or CI gating on structural equivalence.
+
 ## Usage
 
 ```bash
 filepacks compare <baseline> <candidate>
 ```
+
+## When to use it
+
+- comparing a new agent run to the previously accepted run
+- checking whether eval output changed between two runs
+- reviewing generated files in CI
+- deciding whether a candidate artifact needs human attention
 
 ## What compare does
 
@@ -21,7 +34,13 @@ It reads both manifests and reports:
 
 A file is changed when its `size` or `hash` differs.
 
-## Output
+## Minimal example
+
+```bash
+filepacks compare ./baseline.fpk ./candidate.fpk
+```
+
+## Expected output shape
 
 Example:
 
@@ -42,6 +61,20 @@ changed_file=summary.txt
 - exit `0`: no differences
 - exit `20`: one or more differences were found
 - exit `1`: usage or file/path error
+
+Treat `20` as “changed”, not “tool failure”.
+
+## Common mistakes
+
+- assuming `compare` explains why a change is good or bad
+- passing a directory instead of a `.fpk` file
+- relying on implicit baseline lookup; you must provide explicit artifact paths
+
+## Related commands
+
+- `verify` before comparing artifacts you plan to trust
+- `inspect` when you want a quick summary before comparison
+- [Diffing](/diffing) for review guidance after the command runs
 
 ## Core API
 

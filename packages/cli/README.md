@@ -1,6 +1,22 @@
 # filepacks CLI
 
-The v0 CLI exposes only the stable public commands:
+The `filepacks` package is the public command-line interface for deterministic `.fpk` artifacts.
+
+It packages a directory into one artifact, prints a summary, verifies integrity, and compares two artifacts with stable exit codes.
+
+## Install
+
+```bash
+npm install -g filepacks
+```
+
+Or run it without a global install:
+
+```bash
+npx filepacks --help
+```
+
+## Public commands
 
 ```bash
 filepacks pack <input> --output <file>
@@ -9,16 +25,44 @@ filepacks verify <file>
 filepacks compare <baseline> <candidate>
 ```
 
-Commands outside that list are intentionally not part of the v0 OSS surface.
+## First useful workflow
 
-## Deferred Commands
+```bash
+filepacks pack ./run-output --output ./run.fpk
+filepacks inspect ./run.fpk
+filepacks verify ./run.fpk
+filepacks compare ./baseline.fpk ./run.fpk
+```
 
-The following command families are intentionally absent from the v0 public CLI:
+## Output conventions
+
+- `pack` prints `input=`, `output=`, `name=`, `digest=`, `files=`, `bytes=`
+- `inspect` prints `path=`, `name=`, `version=`, `digest=`, `files=`, `bytes=`
+- `verify` prints `ok=true` or `ok=false`
+- `compare` exits `0` for identical artifacts and `20` for structural differences
+
+## When to use the CLI
+
+Use the CLI when you want a shell-friendly workflow for:
+
+- agent run artifacts
+- eval output snapshots
+- CI evidence capture
+- baseline-versus-candidate review
+
+If you need structured results inside Node.js code, use `@filepacks/core` instead.
+
+## Public boundary
+
+Commands outside the list above are intentionally not part of the v0 OSS surface.
+
+That includes:
 
 - registry, remote storage, and sync commands
 - local store, tag, alias, and baseline commands
 - typed eval/import adapters
 - history, events, show, list, and unpack commands
 
-Those areas may be revisited later, but they are not bundled into this package
-and are not public commitments for v0.
+See the repository docs for the full CLI reference and workflows:
+
+- https://github.com/robertonevarez/filepacks-oss/tree/main/docs/cli

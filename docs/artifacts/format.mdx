@@ -1,6 +1,6 @@
 ---
 title: Format
-description: The current public .fpk archive layout and file-level rules.
+description: Archive layout, path rules, and format constraints for valid .fpk artifacts.
 ---
 
 ## Archive layout
@@ -15,6 +15,8 @@ payload/<relative-path>
 payload/<relative-path>
 ...
 ```
+
+That layout is intentionally small: one manifest plus regular payload files.
 
 ## Required rules
 
@@ -37,6 +39,15 @@ Verifier requirements:
 - invalid payload paths must be rejected
 - duplicate payload relative paths must be rejected
 
+## Why these rules exist
+
+These constraints keep the format predictable:
+
+- `manifest.json` first makes the artifact self-describing immediately
+- `payload/` keeps file content separate from metadata
+- no directory entries avoids tar-specific ambiguity
+- normalized paths make comparison consistent across platforms
+
 ## Path rules
 
 Payload paths in the manifest:
@@ -58,6 +69,14 @@ Examples:
 | `/outputs/run-1.json` | no |
 | `outputs\\run-1.json` | no |
 | `outputs/../run-1.json` | no |
+
+## What this means for developers
+
+If `pack` succeeds, the public CLI has already emitted a conforming artifact. You usually care about the full format rules when:
+
+- writing your own producer or verifier around `@filepacks/core`
+- validating a `.fpk` file from somewhere else
+- debugging why a malformed archive was rejected
 
 ## Artifact identity
 

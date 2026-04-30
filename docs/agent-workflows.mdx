@@ -1,0 +1,84 @@
+---
+title: Agent workflows
+description: Use filepacks as durable evidence for agent runs, eval harnesses, and repeated review loops.
+---
+
+filepacks fits agent workflows because it produces deterministic files that both humans and automation can reason about.
+
+An agent can create an artifact at the end of a run, another agent can inspect or compare it later, and a human reviewer can verify the same file before accepting it.
+
+## Pattern: package the run output immediately
+
+When an agent writes files to a directory, package that directory before the workspace changes again:
+
+```bash
+filepacks pack ./agent-output --output ./run-42.fpk
+filepacks inspect ./run-42.fpk
+filepacks verify ./run-42.fpk
+```
+
+That gives the run a stable artifact identity and a canonical manifest.
+
+## Pattern: compare against an accepted baseline
+
+Keep one explicit baseline artifact and compare new runs against it:
+
+```bash
+filepacks compare ./accepted-run.fpk ./run-42.fpk
+```
+
+Interpret the result like this:
+
+- exit `0`: the packaged output matches the accepted baseline
+- exit `20`: the packaged output changed and needs review
+- exit `1`: the command failed or an artifact could not be read
+
+The public OSS CLI does not resolve baseline aliases or tags for you. Use explicit file paths.
+
+## Pattern: use artifacts as durable evidence
+
+Artifacts are useful when the original run environment is temporary:
+
+- ephemeral CI runners
+- sandboxed agent workspaces
+- eval jobs that clean up after completion
+- handoff between one agent run and the next review step
+
+Instead of preserving the entire workspace, preserve the `.fpk` file.
+
+## Pattern: hand off to a human reviewer
+
+A human reviewer can work from the same artifact:
+
+```bash
+filepacks inspect ./run-42.fpk
+filepacks verify ./run-42.fpk
+filepacks compare ./accepted-run.fpk ./run-42.fpk
+```
+
+This reduces ambiguity because the review starts from a deterministic file, not a paraphrased summary of what the agent claims it produced.
+
+## Pattern: embed filepacks in a harness
+
+Use `@filepacks/core` when the workflow already runs inside Node.js:
+
+```ts
+import {pack, compare, verify} from '@filepacks/core'
+
+await pack({input: outputDir, output: artifactPath})
+const verification = await verify({artifact: artifactPath})
+const diff = await compare({baseline: baselineArtifact, candidate: artifactPath})
+```
+
+That gives a harness structured results without parsing CLI output.
+
+## What filepacks helps agents do better
+
+- preserve generated outputs as one portable file
+- compare repeated runs using deterministic rules
+- hand off durable evidence to the next tool or reviewer
+- reduce ambiguity around “what exactly changed?”
+
+## What it does not do
+
+filepacks does not judge whether a change is correct. It gives you deterministic evidence and a structural diff. Your review logic, eval logic, or acceptance criteria still decide whether the change is good.

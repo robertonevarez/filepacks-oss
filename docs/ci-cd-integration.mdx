@@ -1,9 +1,9 @@
 ---
 title: CI/CD Integration
-description: Use filepacks in CI to preserve deterministic build or evaluation evidence and compare it against a baseline artifact.
+description: Use filepacks in CI to preserve generated output as deterministic evidence and compare it against an explicit baseline.
 ---
 
-The public OSS CLI is useful in CI when you want generated files to become a deterministic artifact that can be reviewed later.
+The public OSS CLI is useful in CI when you want generated files to become deterministic, portable evidence instead of a loose job workspace.
 
 ## Basic CI pattern
 
@@ -19,6 +19,13 @@ filepacks verify ./candidate.fpk
 filepacks compare ./baseline.fpk ./candidate.fpk
 ```
 
+## Why this works well in CI
+
+- the artifact is one file you can upload
+- `verify` confirms integrity before downstream use
+- `compare` gives deterministic exit codes for “same”, “changed”, and “failed”
+- reviewers can inspect the exact same artifact later
+
 ## Exit handling
 
 For the current public CLI:
@@ -28,9 +35,9 @@ For the current public CLI:
 - `compare` exits `0` when the artifacts are identical
 - `compare` exits `20` when files differ
 
-That makes it easy to gate a job on structural equivalence.
+That makes it easy to separate “artifact changed” from “command failed”.
 
-## Example GitHub Actions workflow
+## Example: strict GitHub Actions gate
 
 ```yaml
 - name: Install filepacks
@@ -53,7 +60,41 @@ That makes it easy to gate a job on structural equivalence.
     path: candidate.fpk
 ```
 
-If `compare` exits `20`, the workflow fails and `candidate.fpk` is preserved for human review.
+If you want any structural difference to fail the job, this is enough.
+
+## Example: preserve artifact and fail only after capture
+
+If you want to keep the candidate artifact even when the output changed, capture the exit code explicitly:
+
+```yaml
+- name: Compare against baseline
+  id: compare
+  shell: bash
+  run: |
+    set +e
+    filepacks compare ./baseline.fpk ./candidate.fpk
+    status=$?
+    set -e
+
+    if [ "$status" -eq 1 ]; then
+      exit 1
+    fi
+
+    echo "status=$status" >> "$GITHUB_OUTPUT"
+
+- name: Upload candidate artifact
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: candidate
+    path: candidate.fpk
+
+- name: Fail when output changed
+  if: steps.compare.outputs.status == '20'
+  run: exit 1
+```
+
+This treats `20` as “review needed” instead of “tool failure”.
 
 ## Agent and eval runner workflows
 
@@ -96,7 +137,7 @@ For the current OSS workflow, keep at least:
 
 ## Baseline management
 
-The public OSS docs do not define a baseline registry or tag workflow. In CI, the simplest pattern is to store or version the baseline artifact explicitly and compare against that file path.
+The public OSS surface does not define a baseline registry or tag workflow. In CI, store the baseline artifact explicitly and compare against that file path.
 
 Common approaches:
 

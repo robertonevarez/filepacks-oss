@@ -47,23 +47,16 @@
           "quickstart",
           "installation",
           "why-filepacks",
+          "use-cases",
           "concepts",
           "diffing"
         ]
       },
       {
-        "group": "Artifacts",
-        "pages": [
-          "artifacts",
-          "artifacts/format",
-          "artifacts/manifest",
-          "artifacts/determinism"
-        ]
-      },
-      {
         "group": "CLI",
         "pages": [
-          "cli",
+          "cli/index",
+          "cli/workflows",
           "cli/pack",
           "cli/inspect",
           "cli/verify",
@@ -71,11 +64,21 @@
         ]
       },
       {
+        "group": "Artifacts",
+        "pages": [
+          "artifacts/index",
+          "artifacts/manifest",
+          "artifacts/format",
+          "artifacts/determinism"
+        ]
+      },
+      {
         "group": "Guides",
         "pages": [
+          "agent-workflows",
           "ci-cd-integration",
-          "faq",
-          "troubleshooting"
+          "troubleshooting",
+          "faq"
         ]
       }
     ]

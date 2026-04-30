@@ -1,13 +1,26 @@
 ---
 title: Pack
-description: Create a deterministic .fpk artifact from a directory.
+description: Create a deterministic .fpk artifact from a directory of regular files.
 ---
+
+## What it does
+
+`pack` walks an input directory, hashes each file, builds a `format_version: 1` manifest, and writes a deterministic `.fpk` archive.
+
+Use it whenever a workflow finishes producing files and you want one portable artifact instead of a loose directory.
 
 ## Usage
 
 ```bash
 filepacks pack <input> --output <file>
 ```
+
+## When to use it
+
+- after an agent run writes output files
+- after an eval or CI job produces reports
+- before handing generated files to another reviewer or tool
+- before capturing a baseline for later comparison
 
 ## Arguments
 
@@ -16,18 +29,13 @@ filepacks pack <input> --output <file>
 
 `pack` is the only public CLI command with a flag today, and `--output` is required.
 
-## What pack does
+## Minimal example
 
-`pack`:
+```bash
+filepacks pack ./run-output --output ./run-output.fpk
+```
 
-- validates that the input exists and is a directory
-- walks files in lexical order
-- rejects non-regular files
-- hashes each payload file with SHA-256
-- builds a `format_version: 1` manifest
-- writes a deterministic POSIX tar archive
-
-## Output
+## Expected output shape
 
 Example:
 
@@ -43,12 +51,18 @@ bytes=12
 
 The artifact name defaults to the input directory basename in the CLI.
 
-## Constraints
+## Common mistakes
 
-- input must be a directory
-- only regular files are supported
-- payload paths are normalized to use `/`
-- the CLI does not expose a `--name` flag
+- passing a file instead of a directory
+- forgetting `--output`
+- trying to package symlinks or other non-regular files
+- assuming the CLI supports `--name` (it does not)
+
+## Related commands
+
+- `inspect` to read the artifact summary you just created
+- `verify` before sharing or storing the artifact
+- `compare` to check the artifact against a baseline
 
 ## Core API
 

@@ -1,13 +1,13 @@
 ---
 title: Manifest
-description: The current public format_version 1 manifest fields and validation rules.
+description: The format_version 1 manifest fields, validation rules, and how they map to inspect, verify, and compare.
 ---
 
 `manifest.json` is UTF-8 JSON written with two-space indentation and one trailing newline.
 
 The current public generic manifest uses `format_version: 1`.
 
-## Manifest fields
+## Annotated example
 
 ```json
 {
@@ -26,6 +26,18 @@ The current public generic manifest uses `format_version: 1`.
   "total_bytes": 12
 }
 ```
+
+## What the fields mean
+
+| Field | Meaning | Used by |
+| --- | --- | --- |
+| `artifact_name` | Human-readable name of the artifact | `pack`, `inspect`, `compare` results |
+| `created_with` | Producer identity; must be `filepacks` | manifest validation |
+| `file_count` | Number of payload files | `inspect`, `verify` |
+| `files[]` | Sorted file descriptors | `verify`, `compare` |
+| `format_version` | Manifest version; current public value is `1` | manifest validation |
+| `payload_digest` | Digest over the sorted manifest file list | `verify` |
+| `total_bytes` | Sum of payload file sizes | `inspect`, `verify` |
 
 ## Required fields
 
@@ -46,6 +58,12 @@ Each file descriptor contains:
 | `path` | normalized payload-relative path |
 | `size` | non-negative integer |
 | `hash` | lowercase hex SHA-256 digest of exact payload bytes |
+
+## How the CLI uses the manifest
+
+- `inspect` prints a summary derived from `artifact_name`, `format_version`, `file_count`, and `total_bytes`
+- `verify` checks that the payload files still match `files[]` and `payload_digest`
+- `compare` compares the `files[]` lists from two artifacts by path, size, and hash
 
 ## Validation behavior
 

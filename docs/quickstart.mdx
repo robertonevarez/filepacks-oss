@@ -1,11 +1,11 @@
 ---
 title: Quickstart
-description: Package a directory into a .fpk artifact, inspect it, verify it, and compare it against another run.
+description: Go from a generated directory to a verified and comparable .fpk artifact in a few minutes.
 ---
 
-This quickstart walks through the core workflow: pack a directory, inspect and verify the artifact, then compare two runs.
+This walkthrough takes a directory of generated output, turns it into a `.fpk` artifact, and shows how to review it.
 
-The same four commands apply whether you're packaging CI build output, agent run files, or eval results.
+The same pattern works for agent runs, eval snapshots, CI reports, and any other workflow that emits files.
 
 ## Install the CLI
 
@@ -19,7 +19,7 @@ Or run commands without a global install:
 npx filepacks --help
 ```
 
-## Create two example directories
+## Create example output directories
 
 ```bash
 mkdir -p ./demo/baseline
@@ -29,7 +29,9 @@ printf 'hello from baseline\n' > ./demo/baseline/summary.txt
 printf 'hello from candidate\n' > ./demo/candidate/summary.txt
 ```
 
-## Pack the baseline and candidate
+You now have two output directories that differ by one file.
+
+## Pack each directory
 
 ```bash
 filepacks pack ./demo/baseline --output ./baseline.fpk
@@ -48,7 +50,9 @@ files=1
 bytes=20
 ```
 
-## Inspect an artifact
+`pack` creates one portable `.fpk` file per directory. The archive digest is printed as `sha256:<hex>`.
+
+## Inspect what you created
 
 ```bash
 filepacks inspect ./baseline.fpk
@@ -66,7 +70,9 @@ files=1
 bytes=20
 ```
 
-## Verify integrity
+Use `inspect` when you want a quick summary: artifact name, format version, digest, file count, and total bytes.
+
+## Verify integrity before trusting it
 
 ```bash
 filepacks verify ./baseline.fpk
@@ -80,6 +86,8 @@ path=/absolute/path/to/baseline.fpk
 ok=true
 files_checked=1
 ```
+
+Use `verify` before sharing an artifact, uploading it, or using it as a baseline. It confirms that the payload still matches the manifest.
 
 ## Compare baseline and candidate
 
@@ -102,7 +110,19 @@ changed_file=summary.txt
 
 If the artifacts are identical, `compare` exits `0` with `ok=true`.
 
-In automation, you can use the exit code to gate a pipeline step: exit `0` means the run matches the baseline; exit `20` means something changed and needs review.
+In automation, the exit code matters:
+
+- `0` means the candidate matches the baseline
+- `20` means one or more packaged files changed
+- `1` means the command was used incorrectly or an artifact could not be read
+
+## What to look at next
+
+When `compare` reports a change:
+
+1. Use the `changed_file=`, `added_file=`, and `removed_file=` lines to find the affected paths.
+2. Review the original output directories or the files inside the `.fpk` artifact in your own tooling.
+3. If the change is acceptable, store the candidate artifact explicitly as the next baseline. The public OSS CLI does not manage baselines for you.
 
 ## What you just used
 
@@ -115,7 +135,7 @@ Those four commands are the current public CLI surface.
 
 ## Next steps
 
-- Read [Why filepacks](/docs/why-filepacks) for the design rationale
-- See [Artifacts](/docs/artifacts) for the `.fpk` format and manifest rules
-- Use the [CLI overview](/docs/cli) for command-by-command reference
-- See [CI/CD Integration](/docs/ci-cd-integration) for GitHub Actions and agent workflows
+1. Read [Why filepacks](/why-filepacks) for when the artifact model is useful.
+2. Use [CLI workflows](/cli/workflows) for repeatable patterns in scripts and CI.
+3. Read [Use cases](/use-cases) for eval, agent, and review scenarios.
+4. Use [Artifacts](/artifacts) when you need format-level details.

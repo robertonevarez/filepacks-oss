@@ -1,32 +1,47 @@
 ---
 title: Introduction
-description: Filepacks packages output directories into deterministic .fpk artifacts that can be inspected, verified, and compared.
+description: Turn generated directories into deterministic .fpk artifacts that humans and agents can inspect, verify, compare, and hand off.
 ---
 
-filepacks is a narrow OSS tool for turning a directory of files into a deterministic `.fpk` artifact — a single portable file you can inspect, verify, and compare against another run.
+filepacks is artifact infrastructure for workflows that produce files.
 
-It is useful wherever you produce repeated file output and want a stable, reviewable evidence boundary: agent runs, eval outputs, CI build artifacts, regression bundles.
+It takes a directory of generated output and turns it into one deterministic `.fpk` file with a canonical manifest. That gives you a stable unit you can:
 
-## What a `.fpk` artifact gives you
+- **pack** after a run completes
+- **inspect** without unpacking to a working directory
+- **verify** before you trust or share it
+- **compare** against another run with predictable exit codes
 
-- One stable file instead of a loose output directory
-- A canonical `manifest.json` as the first archive entry with full file inventory
-- Payload files stored under `payload/`
-- Deterministic archive bytes for the same logical input
-- Structural comparison based on manifest entries, not ad hoc directory diffs
+That makes filepacks a good fit for agent runs, eval outputs, CI evidence, regression review, and portable artifact handoff.
 
-## CLI and library
+## What you get from a `.fpk` artifact
 
-Use the CLI when you want a command-line workflow:
+- **One reviewable file** instead of a loose directory tree
+- **A canonical `manifest.json`** that records file paths, sizes, hashes, counts, and totals
+- **Deterministic bytes** for the same logical input, so the archive digest is meaningful
+- **Local verification** that the payload still matches the manifest
+- **Manifest-driven comparison** that reports added, removed, and changed files consistently
+
+## Default CLI workflow
 
 ```bash
-filepacks pack ./run --output ./run.fpk
+filepacks pack ./run-output --output ./run.fpk
 filepacks inspect ./run.fpk
 filepacks verify ./run.fpk
 filepacks compare ./baseline.fpk ./run.fpk
 ```
 
-Use `@filepacks/core` when you want to build around the artifact format from code:
+`compare` exits `0` when the artifacts are structurally identical and `20` when any packaged file changed. That makes it directly usable in scripts, CI jobs, and agent harnesses.
+
+## CLI or library?
+
+| If you want to... | Use |
+| --- | --- |
+| Package and review artifacts from the shell | `filepacks` CLI |
+| Build artifact handling into a runner, harness, or tool | `@filepacks/core` |
+| Understand the artifact contract itself | `spec/FILEPACK_SPEC.md` and the artifact reference pages |
+
+Use `@filepacks/core` when you want structured results in code:
 
 ```ts
 import {pack, inspect, verify, compare} from '@filepacks/core'
@@ -42,18 +57,28 @@ const diff = await compare({
 
 ## Public OSS surface
 
-The public CLI and library include:
+The public OSS surface is intentionally narrow:
 
 - `pack` — create a deterministic `.fpk` artifact from a directory
 - `inspect` — read artifact metadata from a `.fpk` file
-- `verify` — check the payload against the manifest, exit non-zero on mismatches
-- `compare` — structural comparison of two artifacts, exit `20` when they differ
+- `verify` — validate the payload against the manifest
+- `compare` — structurally compare two artifacts
 
-The public OSS surface does not include registry workflows, local store management, tags, typed eval manifests, or hosted product behavior.
+It does **not** include registries, remote storage, tags, local baseline resolution, typed eval artifacts, hosted dashboards, or cloud workflows.
 
-## Next steps
+## Why teams use it
 
-- Start with [Quickstart](/docs/quickstart)
-- Read [Why filepacks](/docs/why-filepacks) for the design rationale
-- Learn the `.fpk` rules in [Artifacts](/docs/artifacts)
-- Use the [CLI reference](/docs/cli)
+filepacks is useful when you need output to be:
+
+- **portable** enough to hand to another person or another agent
+- **inspectable** without recreating the original run environment
+- **verifiable** before you review or compare it
+- **comparable** across repeated runs, prompts, models, or commits
+
+## Start here
+
+1. Start with [Quickstart](/quickstart).
+2. Read [Why filepacks](/why-filepacks) for the problem framing and boundaries.
+3. Use [CLI workflows](/cli/workflows) for practical command patterns.
+4. Read [Use cases](/use-cases) and [Agent workflows](/agent-workflows) for real review loops.
+5. Use [Artifacts](/artifacts) when you need format and manifest details.

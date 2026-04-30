@@ -1,11 +1,11 @@
 ---
 title: Diffing
-description: How filepacks performs structural comparison between two .fpk artifacts.
+description: How to read compare results and use structural diffing in review workflows.
 ---
 
 The current public `filepacks compare` command performs structural comparison only.
 
-It compares the two manifests by path, size, and hash. There is no semantic comparison mode in the current public OSS CLI.
+It compares the two manifests by path, size, and hash. That is enough to answer a practical review question: **did any packaged file change between the baseline and the candidate?**
 
 ## What structural comparison means
 
@@ -17,9 +17,9 @@ It classifies differences as:
 - **removed**: a file exists in the baseline but not the candidate
 - **changed**: same path in both artifacts but different `size` or `hash`
 
-The comparison is manifest-driven. No payload extraction is required — paths are already normalized, file lists are already sorted, and comparison behavior is consistent across environments.
+The comparison is manifest-driven. No manual unpack step is required, and the rules are the same across environments because paths are normalized and manifest entries are sorted.
 
-## Why manifest-based diffing is useful
+## Why this is useful in practice
 
 Ad hoc directory comparison depends on filesystem state and tool choice. Manifest-based comparison has a fixed input format, fixed comparison rules, and a stable exit code.
 
@@ -30,19 +30,49 @@ That makes `compare` a reliable primitive for:
 - gating CI jobs on structural equivalence
 - producing a diff log for human review
 
-## Usage and output
-
-See the full command reference at [CLI — Compare](/docs/cli/compare).
-
-Quick reference:
+## Reading the output
 
 ```bash
 filepacks compare ./baseline.fpk ./candidate.fpk
 ```
 
+Typical output:
+
+```text
+Compare
+baseline=/absolute/path/to/baseline.fpk
+candidate=/absolute/path/to/candidate.fpk
+ok=false
+added=1
+removed=0
+changed=1
+added_file=reports/new.txt
+changed_file=summary.txt
+```
+
 - exit `0`: no differences
 - exit `20`: one or more files were added, removed, or changed
 - exit `1`: usage or file/path error
+
+The per-file lines are meant to drive the next review step. They tell you **which paths to inspect**, not whether the change is desirable.
+
+## A practical review loop
+
+1. `inspect` the candidate if you need a quick summary.
+2. `verify` the candidate before using it as evidence.
+3. `compare` baseline vs candidate.
+4. Review the reported paths in the original output or your own tooling.
+5. If the change is accepted, store the new `.fpk` file as the next baseline explicitly.
+
+## What compare does not tell you
+
+`compare` does **not** tell you whether a change is semantically good, bad, or expected. It only tells you that the packaged files changed structurally.
+
+That is why filepacks works well as evidence infrastructure:
+
+- humans can use the path list to review the right files
+- agents can use the exit code to decide whether to escalate or continue
+- CI can preserve the changed artifact for later inspection
 
 ## Core API
 
@@ -59,12 +89,8 @@ filepacks compare ./baseline.fpk ./candidate.fpk
 
 Each changed file includes both left and right size/hash values.
 
-## What compare does not do
+## See also
 
-The current public CLI does not document or support:
-
-- semantic comparison decisions
-- eval-specific result states
-- local baseline resolution
-- registry-backed references
-- JSON compare output
+1. [CLI — Compare](/cli/compare) for command details.
+2. [CLI workflows](/cli/workflows) for repeatable review patterns.
+3. [Agent workflows](/agent-workflows) for baseline/candidate handoff in repeated runs.
