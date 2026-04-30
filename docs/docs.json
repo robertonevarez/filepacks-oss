@@ -84,5 +84,8 @@
     "socials": {
       "github": "https://github.com/robertonevarez/filepacks-oss"
     }
+  },
+  "navbar": {
+    "links": []
   }
 }
