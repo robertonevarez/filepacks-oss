@@ -1,13 +1,16 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "Filepacks",
+  "name": "filepacks",
   "theme": "mint",
-  "description": "Filepacks creates portable, inspectable artifacts for agent workflows, evals, and regression comparisons.",
+  "description": "filepacks creates portable, inspectable artifacts for agent workflows, evals, and regression comparisons.",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
-  "favicon": "/favicon.ico",
+  "favicon": {
+    "light": "/docs/images/filepacks-favicon.svg",
+    "dark": "/docs/images/filepacks-favicon-dark.svg"
+  },
   "colors": {
     "primary": "#0D9488",
     "light": "#07C983",
