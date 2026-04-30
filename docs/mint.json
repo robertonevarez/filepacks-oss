@@ -1,0 +1,57 @@
+{
+  "name": "Filepacks",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.ico",
+  "colors": {
+    "primary": "#0D9488",
+    "light": "#07C983",
+    "dark": "#0D9488",
+    "anchors": {
+      "from": "#0D9488",
+      "to": "#07C983"
+    }
+  },
+  "modeToggle": {
+    "default": "dark",
+    "isHidden": false
+  },
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://github.com/anomalyco/filepacks"
+  },
+  "anchors": [
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/anomalyco/filepacks"
+    },
+    {
+      "name": "CLI Docs",
+      "icon": "book",
+      "url": "/quickstart"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "quickstart",
+        "cli",
+        "installation"
+      ]
+    },
+    {
+      "group": "Reference",
+      "pages": [
+        "spec"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/anomalyco/filepacks",
+    "twitter": "https://x.com"
+  }
+}

@@ -1,0 +1,24 @@
+# Quickstart
+
+Install the latest CLI from npm:
+
+```bash
+npm install -g filepacks
+```
+
+Or run it without a global install:
+
+```bash
+npx filepacks pack ./run --output run.fpk
+```
+
+Core workflow:
+
+```bash
+filepacks pack ./run --output run.fpk
+filepacks inspect run.fpk
+filepacks verify run.fpk
+filepacks compare baseline.fpk candidate.fpk
+```
+
+`compare` is the review primitive for baseline-vs-candidate changes.
