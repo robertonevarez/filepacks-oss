@@ -93,7 +93,7 @@
   },
   "fonts": {
     "heading": {
-      "family": "Roboto",
+      "family": "default",
       "weight": 500
     }
   }
