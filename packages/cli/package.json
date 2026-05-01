@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/robertonevarez/filepacks-oss.git",
+    "url": "git+https://github.com/robertonevarez/filepacks-oss.git",
     "directory": "packages/cli"
   },
   "keywords": [
@@ -21,7 +21,7 @@
   ],
   "type": "module",
   "bin": {
-    "filepacks": "./bin/filepacks.js"
+    "filepacks": "bin/filepacks.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
