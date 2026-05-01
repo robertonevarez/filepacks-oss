@@ -90,11 +90,5 @@
   },
   "navbar": {
     "links": []
-  },
-  "fonts": {
-    "heading": {
-      "family": "default",
-      "weight": 500
-    }
   }
 }
