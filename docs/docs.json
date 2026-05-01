@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "name": "filepacks",
-  "theme": "palm",
+  "theme": "mint",
   "description": "filepacks creates portable, inspectable artifacts for agent workflows, evals, and regression comparisons.",
   "logo": {
     "dark": "public/logo-dark.svg",
