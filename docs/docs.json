@@ -90,5 +90,11 @@
   },
   "navbar": {
     "links": []
+  },
+  "fonts": {
+    "heading": {
+      "family": "Roboto",
+      "weight": 500
+    }
   }
 }
