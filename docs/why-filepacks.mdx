@@ -34,10 +34,10 @@ Without an artifact boundary, those answers usually come from a mix of shell com
 filepacks gives you one portable file and a small repeatable workflow:
 
 ```bash
-filepacks pack ./outputs --output ./run.fpk
-filepacks inspect ./run.fpk
-filepacks verify ./run.fpk
-filepacks compare ./baseline.fpk ./run.fpk
+npx filepacks pack ./outputs --output ./run.fpk
+npx filepacks inspect ./run.fpk
+npx filepacks verify ./run.fpk
+npx filepacks compare ./baseline.fpk ./run.fpk
 ```
 
 That workflow gives you:
@@ -72,8 +72,8 @@ When an AI coding agent or eval runner produces output files, those outputs ofte
 Example:
 
 ```bash
-filepacks pack ./agent-output --output ./run-42.fpk
-filepacks compare ./run-41.fpk ./run-42.fpk
+npx filepacks pack ./agent-output --output ./run-42.fpk
+npx filepacks compare ./run-41.fpk ./run-42.fpk
 ```
 
 `compare` exits `0` if nothing changed and `20` if any packaged file changed. That is enough for a CI job, harness, or review bot to distinguish “same output” from “needs review”.

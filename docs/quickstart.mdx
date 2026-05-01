@@ -9,15 +9,20 @@ The same pattern works for agent runs, eval snapshots, CI reports, and any other
 
 ## Install the CLI
 
-```bash
-npm install -g filepacks
-```
-
-Or run commands without a global install:
+Quick trial from a clean shell:
 
 ```bash
 npx filepacks --help
 ```
+
+If you want the command on your `PATH`, install it globally:
+
+```bash
+npm install -g filepacks
+filepacks --help
+```
+
+The commands below use `npx filepacks ...` so the walkthrough stays copy-pasteable from a clean local state.
 
 ## Create example output directories
 
@@ -34,8 +39,8 @@ You now have two output directories that differ by one file.
 ## Pack each directory
 
 ```bash
-filepacks pack ./demo/baseline --output ./baseline.fpk
-filepacks pack ./demo/candidate --output ./candidate.fpk
+npx filepacks pack ./demo/baseline --output ./baseline.fpk
+npx filepacks pack ./demo/candidate --output ./candidate.fpk
 ```
 
 `pack` writes a deterministic `.fpk` archive and prints a summary like:
@@ -55,7 +60,7 @@ bytes=20
 ## Inspect what you created
 
 ```bash
-filepacks inspect ./baseline.fpk
+npx filepacks inspect ./baseline.fpk
 ```
 
 Example output:
@@ -75,7 +80,7 @@ Use `inspect` when you want a quick summary: artifact name, format version, dige
 ## Verify integrity before trusting it
 
 ```bash
-filepacks verify ./baseline.fpk
+npx filepacks verify ./baseline.fpk
 ```
 
 Example output:
@@ -92,7 +97,7 @@ Use `verify` before sharing an artifact, uploading it, or using it as a baseline
 ## Compare baseline and candidate
 
 ```bash
-filepacks compare ./baseline.fpk ./candidate.fpk
+npx filepacks compare ./baseline.fpk ./candidate.fpk
 ```
 
 If the artifacts differ, `compare` exits with status `20` and prints a structural summary:
@@ -136,6 +141,6 @@ Those four commands are the current public CLI surface.
 ## Next steps
 
 1. Read [Why filepacks](/why-filepacks) for when the artifact model is useful.
-2. Use [CLI workflows](/cli/workflows) for repeatable patterns in scripts and CI.
+2. Use [CLI workflows](/cli/workflows) for repeatable patterns in scripts, CI, and short AI-assisted-work demos.
 3. Read [Use cases](/use-cases) for eval, agent, and review scenarios.
 4. Use [Artifacts](/artifacts) when you need format-level details.

@@ -64,7 +64,7 @@ Yes. `filepacks inspect <file>` reads artifact metadata directly from the `.fpk`
 Run:
 
 ```bash
-filepacks verify ./artifact.fpk
+npx filepacks verify ./artifact.fpk
 ```
 
 If the artifact is invalid, `verify` exits non-zero and reports mismatch lines.
@@ -74,7 +74,7 @@ If the artifact is invalid, `verify` exits non-zero and reports mismatch lines.
 Run:
 
 ```bash
-filepacks compare ./baseline.fpk ./candidate.fpk
+npx filepacks compare ./baseline.fpk ./candidate.fpk
 ```
 
 The command exits `0` if they are structurally identical and `20` if files were added, removed, or changed.
@@ -97,8 +97,8 @@ Yes. Install `@filepacks/core` and call:
 Yes. The CLI and core API are simple enough to integrate directly into an agent workflow or eval harness. After a run produces output files, pack the directory:
 
 ```bash
-filepacks pack ./agent-output --output ./run.fpk
-filepacks compare ./baseline.fpk ./run.fpk
+npx filepacks pack ./agent-output --output ./run.fpk
+npx filepacks compare ./baseline.fpk ./run.fpk
 ```
 
 `compare` exits `0` if nothing changed and `20` if anything did — that exit code is usable in any script or CI job.

@@ -12,9 +12,9 @@ An agent can create an artifact at the end of a run, another agent can inspect o
 When an agent writes files to a directory, package that directory before the workspace changes again:
 
 ```bash
-filepacks pack ./agent-output --output ./run-42.fpk
-filepacks inspect ./run-42.fpk
-filepacks verify ./run-42.fpk
+npx filepacks pack ./agent-output --output ./run-42.fpk
+npx filepacks inspect ./run-42.fpk
+npx filepacks verify ./run-42.fpk
 ```
 
 That gives the run a stable artifact identity and a canonical manifest.
@@ -24,7 +24,7 @@ That gives the run a stable artifact identity and a canonical manifest.
 Keep one explicit baseline artifact and compare new runs against it:
 
 ```bash
-filepacks compare ./accepted-run.fpk ./run-42.fpk
+npx filepacks compare ./accepted-run.fpk ./run-42.fpk
 ```
 
 Interpret the result like this:
@@ -51,9 +51,9 @@ Instead of preserving the entire workspace, preserve the `.fpk` file.
 A human reviewer can work from the same artifact:
 
 ```bash
-filepacks inspect ./run-42.fpk
-filepacks verify ./run-42.fpk
-filepacks compare ./accepted-run.fpk ./run-42.fpk
+npx filepacks inspect ./run-42.fpk
+npx filepacks verify ./run-42.fpk
+npx filepacks compare ./accepted-run.fpk ./run-42.fpk
 ```
 
 This reduces ambiguity because the review starts from a deterministic file, not a paraphrased summary of what the agent claims it produced.

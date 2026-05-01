@@ -15,19 +15,26 @@ description: Install filepacks for command-line use or add @filepacks/core to yo
 | Pack, inspect, verify, and compare artifacts from the shell | `filepacks` CLI |
 | Call the same operations from a Node.js tool or harness | `@filepacks/core` |
 
-## Install the CLI
+## Quick trial
 
-Install globally if you expect to use the command often:
-
-```bash
-npm install -g filepacks
-```
-
-Or use `npx` when you do not want a global install:
+Run filepacks without a persistent install:
 
 ```bash
 npx filepacks --help
 ```
+
+Use `npx filepacks ...` throughout the docs when you want copy-pasteable commands from a clean shell.
+
+## Persistent install
+
+Install the CLI globally when you want `filepacks` on your `PATH`:
+
+```bash
+npm install -g filepacks
+filepacks --help
+```
+
+If you install `filepacks` into a project instead, invoke it with `npx filepacks ...`.
 
 Current public commands:
 
@@ -63,6 +70,12 @@ const diff = await compare({
 ## Verify the CLI install
 
 ```bash
+npx filepacks --help
+```
+
+Or, after a global install:
+
+```bash
 filepacks --help
 ```
 
@@ -77,14 +90,14 @@ Your runtime should be able to import `@filepacks/core` and call `pack()`, `insp
 After installation, the fastest way to confirm the workflow is:
 
 ```bash
-filepacks pack ./some-output-directory --output ./example.fpk
-filepacks inspect ./example.fpk
+npx filepacks pack ./some-output-directory --output ./example.fpk
+npx filepacks inspect ./example.fpk
 ```
 
 That tells you the install works and shows you the shape of the artifact you just created.
 
 ## Notes
 
-- Artifact file paths used with `inspect`, `verify`, and `compare` must end in `.fpk`.
+- Artifact file paths used with `pack --output`, `inspect`, `verify`, and `compare` must end in `.fpk`.
 - The CLI does not expose registry, tag, baseline, import, show, or unpack commands in the public OSS surface.
 - The core API accepts an optional `name` field when packing. The public CLI does not currently expose a `--name` flag.

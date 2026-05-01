@@ -22,9 +22,9 @@ filepacks is most useful when a workflow already produces files and you need tho
 When each eval run emits files, package each run immediately:
 
 ```bash
-filepacks pack ./eval-output --output ./eval-run-42.fpk
-filepacks verify ./eval-run-42.fpk
-filepacks compare ./eval-baseline.fpk ./eval-run-42.fpk
+npx filepacks pack ./eval-output --output ./eval-run-42.fpk
+npx filepacks verify ./eval-run-42.fpk
+npx filepacks compare ./eval-baseline.fpk ./eval-run-42.fpk
 ```
 
 If `compare` exits `20`, the run changed structurally and needs review.
@@ -34,9 +34,9 @@ If `compare` exits `20`, the run changed structurally and needs review.
 When an agent finishes producing files:
 
 ```bash
-filepacks pack ./agent-output --output ./agent-run-17.fpk
-filepacks inspect ./agent-run-17.fpk
-filepacks verify ./agent-run-17.fpk
+npx filepacks pack ./agent-output --output ./agent-run-17.fpk
+npx filepacks inspect ./agent-run-17.fpk
+npx filepacks verify ./agent-run-17.fpk
 ```
 
 Now the artifact can be uploaded, attached to a ticket, or handed to another reviewer without relying on the original workspace.

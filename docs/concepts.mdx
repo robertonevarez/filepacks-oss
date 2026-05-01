@@ -116,11 +116,11 @@ The public OSS CLI does not resolve baselines for you. You pass explicit file pa
 A common review loop looks like this:
 
 ```bash
-filepacks pack ./run-prev --output ./baseline.fpk
-filepacks pack ./run-current --output ./candidate.fpk
-filepacks inspect ./candidate.fpk
-filepacks verify ./candidate.fpk
-filepacks compare ./baseline.fpk ./candidate.fpk
+npx filepacks pack ./run-prev --output ./baseline.fpk
+npx filepacks pack ./run-current --output ./candidate.fpk
+npx filepacks inspect ./candidate.fpk
+npx filepacks verify ./candidate.fpk
+npx filepacks compare ./baseline.fpk ./candidate.fpk
 ```
 
 ## CLI versus core library

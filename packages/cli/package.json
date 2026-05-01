@@ -1,7 +1,7 @@
 {
   "name": "filepacks",
   "description": "CLI for deterministic .fpk artifacts.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "filepacks",
   "license": "Apache-2.0",
   "homepage": "https://github.com/robertonevarez/filepacks-oss/tree/main/packages/cli",

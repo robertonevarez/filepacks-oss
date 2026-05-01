@@ -8,15 +8,15 @@ The public OSS CLI is useful in CI when you want generated files to become deter
 ## Basic CI pattern
 
 1. Run a job that generates output files
-2. Package that directory with `filepacks pack`
-3. Verify the artifact with `filepacks verify`
-4. Compare it against a known baseline artifact with `filepacks compare`
+2. Package that directory with `npx filepacks pack`
+3. Verify the artifact with `npx filepacks verify`
+4. Compare it against a known baseline artifact with `npx filepacks compare`
 5. Upload the `.fpk` file as a job artifact for human review if needed
 
 ```bash
-filepacks pack ./build-output --output ./candidate.fpk
-filepacks verify ./candidate.fpk
-filepacks compare ./baseline.fpk ./candidate.fpk
+npx filepacks pack ./build-output --output ./candidate.fpk
+npx filepacks verify ./candidate.fpk
+npx filepacks compare ./baseline.fpk ./candidate.fpk
 ```
 
 ## Why this works well in CI
@@ -72,7 +72,7 @@ If you want to keep the candidate artifact even when the output changed, capture
   shell: bash
   run: |
     set +e
-    filepacks compare ./baseline.fpk ./candidate.fpk
+    npx filepacks compare ./baseline.fpk ./candidate.fpk
     status=$?
     set -e
 
@@ -102,13 +102,13 @@ When an AI coding agent or eval runner produces output files, pack the output di
 
 ```bash
 # Pack agent output after the run completes
-filepacks pack ./agent-output --output ./run-$(date +%s).fpk
+npx filepacks pack ./agent-output --output ./run-$(date +%s).fpk
 
 # Or in an eval harness, pack each run by ID
-filepacks pack ./eval-output --output ./eval-$RUN_ID.fpk
+npx filepacks pack ./eval-output --output ./eval-$RUN_ID.fpk
 
 # Compare the new run against the last accepted run
-filepacks compare ./eval-baseline.fpk ./eval-$RUN_ID.fpk
+npx filepacks compare ./eval-baseline.fpk ./eval-$RUN_ID.fpk
 ```
 
 `compare` exits `0` if the output is structurally identical to the baseline and `20` if anything changed. Either exit code is usable in a script or CI job to decide whether to accept the run.

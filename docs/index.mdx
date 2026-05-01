@@ -25,11 +25,13 @@ That makes filepacks a good fit for agent runs, eval outputs, CI evidence, regre
 ## Default CLI workflow
 
 ```bash
-filepacks pack ./run-output --output ./run.fpk
-filepacks inspect ./run.fpk
-filepacks verify ./run.fpk
-filepacks compare ./baseline.fpk ./run.fpk
+npx filepacks pack ./run-output --output ./run.fpk
+npx filepacks inspect ./run.fpk
+npx filepacks verify ./run.fpk
+npx filepacks compare ./baseline.fpk ./run.fpk
 ```
+
+These docs default to `npx filepacks ...` so the examples work from a clean shell. If you install globally with `npm install -g filepacks`, drop the `npx` prefix.
 
 `compare` exits `0` when the artifacts are structurally identical and `20` when any packaged file changed. That makes it directly usable in scripts, CI jobs, and agent harnesses.
 

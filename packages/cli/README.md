@@ -4,17 +4,20 @@ The `filepacks` package is the public command-line interface for deterministic `
 
 It packages a directory into one artifact, prints a summary, verifies integrity, and compares two artifacts with stable exit codes.
 
-## Install
-
-```bash
-npm install -g filepacks
-```
-
-Or run it without a global install:
+## Quick trial
 
 ```bash
 npx filepacks --help
 ```
+
+## Persistent install
+
+```bash
+npm install -g filepacks
+filepacks --help
+```
+
+If you add `filepacks` to a project instead of installing it globally, run it with `npx filepacks ...`.
 
 ## Public commands
 
@@ -28,10 +31,10 @@ filepacks compare <baseline> <candidate>
 ## First useful workflow
 
 ```bash
-filepacks pack ./run-output --output ./run.fpk
-filepacks inspect ./run.fpk
-filepacks verify ./run.fpk
-filepacks compare ./baseline.fpk ./run.fpk
+npx filepacks pack ./run-output --output ./run.fpk
+npx filepacks inspect ./run.fpk
+npx filepacks verify ./run.fpk
+npx filepacks compare ./baseline.fpk ./run.fpk
 ```
 
 ## Output conventions

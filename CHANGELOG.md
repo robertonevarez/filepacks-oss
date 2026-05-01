@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.2 - 2026-05-01
+
+- Fixed public CLI install guidance to distinguish clean-shell `npx` usage from persistent global installs.
+- Added command-specific help for `pack`, `inspect`, `verify`, and `compare`.
+- Rejected `pack --output` paths that do not end in `.fpk`.
+- Refreshed quickstart and demo docs around AI-assisted software work.
+
 ## 0.1.0 - 2026-04-30
 
 - Introduced initial public npm package split:

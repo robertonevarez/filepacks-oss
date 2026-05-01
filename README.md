@@ -1,6 +1,6 @@
 # filepacks
 
-Artifact infrastructure for agent workflows, eval snapshots, CI evidence, and repeatable file review.
+Portable, inspectable artifacts for AI-generated work, agent workflows, CI evidence, and repeatable file review.
 
 filepacks turns a directory of generated files into a deterministic `.fpk` artifact that you can inspect, verify, compare, and hand off as durable evidence.
 
@@ -47,25 +47,28 @@ This repository does **not** include:
 
 ## Quickstart
 
-Install the CLI:
-
-```bash
-npm install -g filepacks
-```
-
-Or run it without a global install:
+Quick trial from a clean shell:
 
 ```bash
 npx filepacks --help
 ```
 
+Persistent CLI install:
+
+```bash
+npm install -g filepacks
+filepacks --help
+```
+
+The quick trial uses `npx` so the workflow stays copy-pasteable without putting `filepacks` on your `PATH` first.
+
 Core workflow:
 
 ```bash
-filepacks pack ./run-output --output ./run.fpk
-filepacks inspect ./run.fpk
-filepacks verify ./run.fpk
-filepacks compare ./baseline.fpk ./run.fpk
+npx filepacks pack ./run-output --output ./run.fpk
+npx filepacks inspect ./run.fpk
+npx filepacks verify ./run.fpk
+npx filepacks compare ./baseline.fpk ./run.fpk
 ```
 
 ## Packages

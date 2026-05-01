@@ -25,14 +25,14 @@ filepacks pack <input> --output <file>
 ## Arguments
 
 - `<input>`: input directory to package
-- `--output <file>`: required output path for the `.fpk` artifact
+- `--output <file>`: required output path for the `.fpk` artifact; it must end in `.fpk`
 
 `pack` is the only public CLI command with a flag today, and `--output` is required.
 
 ## Minimal example
 
 ```bash
-filepacks pack ./run-output --output ./run-output.fpk
+npx filepacks pack ./run-output --output ./run-output.fpk
 ```
 
 ## Expected output shape
@@ -55,6 +55,7 @@ The artifact name defaults to the input directory basename in the CLI.
 
 - passing a file instead of a directory
 - forgetting `--output`
+- using an output path without the `.fpk` extension
 - trying to package symlinks or other non-regular files
 - assuming the CLI supports `--name` (it does not)
 

@@ -15,7 +15,7 @@ Fix:
 
 ```bash
 ls ./your-input-directory
-filepacks pack ./your-input-directory --output ./artifact.fpk
+npx filepacks pack ./your-input-directory --output ./artifact.fpk
 ```
 
 ### `Input path is not a directory`
@@ -23,6 +23,16 @@ filepacks pack ./your-input-directory --output ./artifact.fpk
 Cause: `pack` only accepts a directory as input.
 
 Fix: pass a directory, not a single file.
+
+### `Output path must end with .fpk`
+
+Cause: `pack --output` was given a path without the required `.fpk` extension.
+
+Fix:
+
+```bash
+npx filepacks pack ./your-input-directory --output ./artifact.fpk
+```
 
 ### `Unsupported file type at:`
 
@@ -48,7 +58,7 @@ Fix:
 
 ```bash
 ls ./artifact.fpk
-filepacks inspect ./artifact.fpk
+npx filepacks inspect ./artifact.fpk
 ```
 
 ### `Artifact manifest.json must be the first archive entry`
@@ -114,8 +124,8 @@ Cause: the command could not run correctly. Common reasons are:
 Fix: verify that both paths are valid artifacts first:
 
 ```bash
-filepacks verify ./baseline.fpk
-filepacks verify ./candidate.fpk
+npx filepacks verify ./baseline.fpk
+npx filepacks verify ./candidate.fpk
 ```
 
 ## A good recovery order

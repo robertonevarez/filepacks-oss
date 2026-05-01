@@ -8,8 +8,8 @@ Use this page when you know the four commands already and want repeatable ways t
 ## Workflow: create the first useful artifact
 
 ```bash
-filepacks pack ./run-output --output ./run-output.fpk
-filepacks inspect ./run-output.fpk
+npx filepacks pack ./run-output --output ./run-output.fpk
+npx filepacks inspect ./run-output.fpk
 ```
 
 Use this when you want fast confirmation that:
@@ -23,7 +23,7 @@ Use this when you want fast confirmation that:
 If an artifact is going to be uploaded, shared, or used as a baseline, verify it first:
 
 ```bash
-filepacks verify ./run-output.fpk
+npx filepacks verify ./run-output.fpk
 ```
 
 Use this before:
@@ -35,7 +35,7 @@ Use this before:
 ## Workflow: baseline vs candidate review
 
 ```bash
-filepacks compare ./baseline.fpk ./candidate.fpk
+npx filepacks compare ./baseline.fpk ./candidate.fpk
 ```
 
 This is the core review loop for repeated runs:
@@ -49,8 +49,8 @@ This is the core review loop for repeated runs:
 When someone hands you a `.fpk` file:
 
 ```bash
-filepacks inspect ./received.fpk
-filepacks verify ./received.fpk
+npx filepacks inspect ./received.fpk
+npx filepacks verify ./received.fpk
 ```
 
 `inspect` tells you what it claims to be. `verify` tells you whether the payload still matches the manifest.
@@ -71,7 +71,7 @@ Or upload the accepted candidate artifact to the location your CI jobs already u
 
 ```bash
 set +e
-filepacks compare ./baseline.fpk ./candidate.fpk
+npx filepacks compare ./baseline.fpk ./candidate.fpk
 status=$?
 set -e
 
@@ -86,6 +86,38 @@ fi
 ```
 
 Treat `20` as “artifact changed”, not “tool crashed”.
+
+## Workflow: 60-second AI-assisted software demo
+
+Use this when you want a short demo that looks like real AI-assisted software work instead of a single `summary.txt` file.
+
+Create two tiny directories with the kinds of files an agent-assisted coding run often produces:
+
+```bash
+mkdir -p ./demo/baseline ./demo/candidate
+
+printf 'Task: checkout fix\nStatus: success\n' > ./demo/baseline/agent-task-summary.md
+printf 'diff --git a/app.js b/app.js\n+console.log("baseline")\n' > ./demo/baseline/changes.patch
+printf 'PASS smoke test\n' > ./demo/baseline/test-output.txt
+printf '{"source":"agent","step":"baseline"}\n' > ./demo/baseline/metadata.json
+
+printf 'Task: checkout fix\nStatus: success\nReviewed by human\n' > ./demo/candidate/agent-task-summary.md
+printf 'diff --git a/app.js b/app.js\n+console.log("candidate")\n' > ./demo/candidate/changes.patch
+printf 'PASS smoke test\nPASS checkout test\n' > ./demo/candidate/test-output.txt
+printf '{"source":"agent","step":"candidate"}\n' > ./demo/candidate/metadata.json
+```
+
+Then run the full review loop:
+
+```bash
+npx filepacks pack ./demo/baseline --output ./baseline.fpk
+npx filepacks pack ./demo/candidate --output ./candidate.fpk
+npx filepacks inspect ./candidate.fpk
+npx filepacks verify ./candidate.fpk
+npx filepacks compare ./baseline.fpk ./candidate.fpk
+```
+
+That flow shows why filepacks matters for AI-assisted software work: one portable artifact preserves the agent's files, `verify` confirms they still match the manifest, and `compare` shows exactly what changed before a human decides whether to ship.
 
 ## Workflow: choose the right command
 
