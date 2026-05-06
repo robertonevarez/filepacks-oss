@@ -8,12 +8,16 @@ import {
   type CompareJsonResult,
   type InspectJsonResult,
   type PackJsonResult,
+  type PushJsonResult,
   type VerifyJsonResult,
 } from '@filepacks/core'
+import {readFile} from 'node:fs/promises'
+import {platform} from 'node:os'
 import {resolve} from 'node:path'
+import {spawn} from 'node:child_process'
 
 const HELP_FLAGS = new Set(['--help', '-h'])
-const COMMAND_NAMES = ['pack', 'inspect', 'verify', 'compare'] as const
+const COMMAND_NAMES = ['pack', 'inspect', 'verify', 'compare', 'push'] as const
 
 type SupportedCommand = (typeof COMMAND_NAMES)[number]
 
@@ -24,8 +28,80 @@ type CommandResult = {
 }
 
 type ParsedFlags = {
+  endpoint?: string
   json?: boolean
+  open?: boolean
   output?: string
+}
+
+type ArtifactSummary = {
+  digest: `sha256:${string}`
+  fileCount: number
+  formatVersion?: number
+  name: string
+  totalBytes: number
+}
+
+type PreviewApiErrorResult = {
+  error: {
+    code: string
+    hint?: string
+    message: string
+  }
+  ok: false
+  operation: 'inspect' | 'verify' | 'compare'
+  preview: true
+}
+
+type PreviewVerifyResult = {
+  filesChecked: number
+  mismatches: Array<{
+    code: string
+    message: string
+    path?: string
+  }>
+  ok: boolean
+  operation: 'verify'
+  preview: true
+}
+
+type PreviewCompareResult = {
+  files: {
+    added: string[]
+    changed: string[]
+    removed: string[]
+  }
+  ok: boolean
+  operation: 'compare'
+  preview: true
+  summary: {
+    added: number
+    changed: number
+    removed: number
+  }
+}
+
+type SingleReviewPayload = {
+  artifact: ArtifactSummary
+  stored: false
+  type: 'single_artifact_review'
+  verification: {
+    filesChecked: number
+    mismatches: PreviewVerifyResult['mismatches']
+    ok: boolean
+  }
+}
+
+type CompareReviewPayload = {
+  baseline: ArtifactSummary
+  candidate: ArtifactSummary
+  comparison: {
+    files: PreviewCompareResult['files']
+    ok: boolean
+    summary: PreviewCompareResult['summary']
+  }
+  stored: false
+  type: 'artifact_compare_review'
 }
 
 export async function main(argv: string[]): Promise<void> {
@@ -46,6 +122,7 @@ export async function run(argv: string[]): Promise<CommandResult> {
     if (command === 'inspect') return await inspectCommand(rest)
     if (command === 'verify') return await verifyCommand(rest)
     if (command === 'compare') return await compareCommand(rest)
+    if (command === 'push') return await pushCommand(rest)
 
     return fail(`Unknown command: ${command ?? ''}`.trim(), "Run 'filepacks --help' for usage")
   } catch (error) {
@@ -259,6 +336,205 @@ async function compareCommand(args: string[]): Promise<CommandResult> {
   }
 }
 
+async function pushCommand(args: string[]): Promise<CommandResult> {
+  const {flags, positional} = parseFlags(args)
+
+  if (!flags.endpoint || positional.length < 1 || positional.length > 2) {
+    if (flags.json) {
+      return failJson(
+        'push',
+        'Usage: filepacks push <artifact> --endpoint <url> [--open] [--json]',
+        "Run 'filepacks push --help' for usage",
+      )
+    }
+
+    return fail(
+      'Usage: filepacks push <artifact> --endpoint <url> [--open] [--json]',
+      "Run 'filepacks push --help' for usage",
+    )
+  }
+
+  const endpoint = normalizeEndpoint(flags.endpoint)
+  if (!endpoint) {
+    if (flags.json) {
+      return failJson('push', `Invalid endpoint URL: ${flags.endpoint}`, 'Provide an absolute http:// or https:// URL.')
+    }
+
+    return fail(`Invalid endpoint URL: ${flags.endpoint}`, 'Provide an absolute http:// or https:// URL.')
+  }
+
+  if (positional.length === 1) {
+    return await pushSingleArtifact({
+      artifactPath: resolve(positional[0]),
+      endpoint,
+      json: Boolean(flags.json),
+      open: Boolean(flags.open),
+    })
+  }
+
+  return await pushCompareArtifacts({
+    baselinePath: resolve(positional[0]),
+    candidatePath: resolve(positional[1]),
+    endpoint,
+    json: Boolean(flags.json),
+    open: Boolean(flags.open),
+  })
+}
+
+async function pushSingleArtifact({
+  artifactPath,
+  endpoint,
+  json,
+  open,
+}: {
+  artifactPath: string
+  endpoint: string
+  json: boolean
+  open: boolean
+}): Promise<CommandResult> {
+  const [artifact, verification] = await Promise.all([
+    inspect({artifact: artifactPath}),
+    verify({artifact: artifactPath}),
+  ])
+
+  if (!verification.ok) {
+    return json
+      ? failJson('push', 'Local artifact verification failed.', 'Run `filepacks verify <artifact>` for details.')
+      : fail('Local artifact verification failed.', 'Run `filepacks verify <artifact>` for details.')
+  }
+
+  const preview = await postMultipart<PreviewVerifyResult | PreviewApiErrorResult>({
+    endpoint,
+    files: [{field: 'artifact', path: artifactPath}],
+    route: '/api/preview/artifacts/verify',
+  })
+
+  if ('error' in preview) {
+    return json
+      ? failJson('push', preview.error.message, preview.error.hint)
+      : fail(preview.error.message, preview.error.hint)
+  }
+
+  const payload: SingleReviewPayload = {
+    artifact: summarizeArtifact(artifact),
+    stored: false,
+    type: 'single_artifact_review',
+    verification: {
+      filesChecked: preview.filesChecked,
+      mismatches: preview.mismatches,
+      ok: preview.ok,
+    },
+  }
+  const reviewUrl = buildReviewUrl(endpoint, payload)
+  const opened = open ? await openUrl(reviewUrl) : false
+
+  if (json) {
+    return okJson({
+      command: 'push',
+      endpoint,
+      mode: 'temporary_review',
+      ok: true,
+      opened,
+      reviewUrl,
+      stored: false,
+    } satisfies PushJsonResult)
+  }
+
+  return ok([
+    'Push',
+    'mode=temporary_review',
+    'stored=false',
+    `artifact=${artifactPath}`,
+    `endpoint=${endpoint}`,
+    `verified=${String(preview.ok)}`,
+    open ? `opened=${reviewUrl}` : `review_url=${reviewUrl}`,
+    open && !opened ? 'open_failed=true' : undefined,
+  ].filter(Boolean).join('\n') + '\n')
+}
+
+async function pushCompareArtifacts({
+  baselinePath,
+  candidatePath,
+  endpoint,
+  json,
+  open,
+}: {
+  baselinePath: string
+  candidatePath: string
+  endpoint: string
+  json: boolean
+  open: boolean
+}): Promise<CommandResult> {
+  const [baseline, candidate, baselineVerify, candidateVerify] = await Promise.all([
+    inspect({artifact: baselinePath}),
+    inspect({artifact: candidatePath}),
+    verify({artifact: baselinePath}),
+    verify({artifact: candidatePath}),
+  ])
+
+  if (!baselineVerify.ok || !candidateVerify.ok) {
+    return json
+      ? failJson('push', 'Local artifact verification failed.', 'Run `filepacks verify <artifact>` for details.')
+      : fail('Local artifact verification failed.', 'Run `filepacks verify <artifact>` for details.')
+  }
+
+  const preview = await postMultipart<PreviewCompareResult | PreviewApiErrorResult>({
+    endpoint,
+    files: [
+      {field: 'baseline', path: baselinePath},
+      {field: 'candidate', path: candidatePath},
+    ],
+    route: '/api/preview/artifacts/compare',
+  })
+
+  if ('error' in preview) {
+    return json
+      ? failJson('push', preview.error.message, preview.error.hint)
+      : fail(preview.error.message, preview.error.hint)
+  }
+
+  const payload: CompareReviewPayload = {
+    baseline: summarizeArtifact(baseline),
+    candidate: summarizeArtifact(candidate),
+    comparison: {
+      files: preview.files,
+      ok: preview.ok,
+      summary: preview.summary,
+    },
+    stored: false,
+    type: 'artifact_compare_review',
+  }
+  const reviewUrl = buildReviewUrl(endpoint, payload)
+  const opened = open ? await openUrl(reviewUrl) : false
+
+  if (json) {
+    return okJson({
+      command: 'push',
+      endpoint,
+      mode: 'temporary_compare_review',
+      ok: true,
+      opened,
+      reviewUrl,
+      stored: false,
+      summary: preview.summary,
+    } satisfies PushJsonResult)
+  }
+
+  return ok([
+    'Push',
+    'mode=temporary_compare_review',
+    'stored=false',
+    `baseline=${baselinePath}`,
+    `candidate=${candidatePath}`,
+    `endpoint=${endpoint}`,
+    `added=${preview.summary.added}`,
+    `changed=${preview.summary.changed}`,
+    `removed=${preview.summary.removed}`,
+    open ? `opened=${reviewUrl}` : `review_url=${reviewUrl}`,
+    open && !opened ? 'open_failed=true' : undefined,
+  ].filter(Boolean).join('\n') + '\n')
+}
+
 function parseFlags(args: string[]): {flags: ParsedFlags; positional: string[]} {
   const flags: ParsedFlags = {}
   const positional: string[] = []
@@ -271,8 +547,19 @@ function parseFlags(args: string[]): {flags: ParsedFlags; positional: string[]} 
       continue
     }
 
+    if (value === '--endpoint') {
+      flags.endpoint = args[index + 1]
+      index += 1
+      continue
+    }
+
     if (value === '--json') {
       flags.json = true
+      continue
+    }
+
+    if (value === '--open') {
+      flags.open = true
       continue
     }
 
@@ -324,6 +611,8 @@ function hasJsonFlag(args: string[]): boolean {
 
 function errorCodeForMessage(message: string): string {
   if (message.startsWith('Usage:')) return 'usage'
+  if (message.includes('endpoint')) return 'invalid_endpoint'
+  if (message.includes('verification failed')) return 'invalid_artifact'
   if (message.includes('must end with .fpk')) return 'invalid_output_path'
   if (message.includes('does not exist')) return 'not_found'
   if (message.includes('not a directory')) return 'invalid_input'
@@ -337,6 +626,8 @@ function usage(): string {
     'filepacks inspect <file>',
     'filepacks verify <file>',
     'filepacks compare <baseline> <candidate>',
+    'filepacks push <artifact> --endpoint <url> [--open]',
+    'filepacks push <baseline> <candidate> --endpoint <url> [--open]',
   ].join('\n')
 }
 
@@ -363,6 +654,7 @@ function helpText(): string {
     '  inspect    Read artifact metadata',
     '  verify     Validate artifact integrity',
     '  compare    Structurally compare two artifacts',
+    '  push       Send artifacts to a temporary review endpoint',
     '',
     'Quick trial:',
     '  npx filepacks pack ./agent-run --output ./agent-run.fpk',
@@ -382,7 +674,8 @@ function commandHelpText(command: SupportedCommand): string {
   if (command === 'pack') return packHelpText()
   if (command === 'inspect') return inspectHelpText()
   if (command === 'verify') return verifyHelpText()
-  return compareHelpText()
+  if (command === 'compare') return compareHelpText()
+  return pushHelpText()
 }
 
 function packHelpText(): string {
@@ -489,6 +782,135 @@ function compareHelpText(): string {
     '  1   Usage or file/path error',
     '',
   ].join('\n')
+}
+
+function pushHelpText(): string {
+  return [
+    'filepacks push — send .fpk artifacts to a temporary review endpoint',
+    '',
+    'Usage:',
+    '  filepacks push <artifact> --endpoint <url> [--open] [--json]',
+    '  filepacks push <baseline> <candidate> --endpoint <url> [--open] [--json]',
+    '',
+    'Arguments:',
+    '  <artifact>        Existing .fpk artifact to verify and review',
+    '  <baseline>        Existing .fpk artifact used as the reference',
+    '  <candidate>       Existing .fpk artifact you want to review',
+    '',
+    'Flags:',
+    '  --endpoint <url>  Required preview endpoint such as http://localhost:3000',
+    '  --open            Open /app with the encoded review result in a browser',
+    '  --json            Print structured JSON for agents and automation',
+    '',
+    'Notes:',
+    '  push is an experimental review handoff command.',
+    '  Artifacts are processed by the preview API for the request and are not stored.',
+    '  Use --open to open the human review surface in a browser.',
+    '',
+    'Exit behavior:',
+    '  0   Temporary review handoff succeeded',
+    '  1   Usage, path, network, API, or local verification error',
+    '',
+  ].join('\n')
+}
+
+function normalizeEndpoint(value: string): string {
+  try {
+    const url = new URL(value)
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return ''
+    url.hash = ''
+    url.search = ''
+    return url.toString().replace(/\/$/, '')
+  } catch {
+    return ''
+  }
+}
+
+function buildReviewUrl(endpoint: string, payload: SingleReviewPayload | CompareReviewPayload): string {
+  return `${endpoint}/app#review=${encodeBase64Url(JSON.stringify(payload))}`
+}
+
+function encodeBase64Url(value: string): string {
+  return Buffer.from(value, 'utf8').toString('base64url')
+}
+
+function summarizeArtifact(artifact: Awaited<ReturnType<typeof inspect>>): ArtifactSummary {
+  return {
+    digest: `sha256:${artifact.artifactDigest}`,
+    fileCount: artifact.manifest.file_count,
+    formatVersion: artifact.manifest.format_version,
+    name: artifact.manifest.artifact_name,
+    totalBytes: artifact.manifest.total_bytes,
+  }
+}
+
+async function postMultipart<TResult>({
+  endpoint,
+  files,
+  route,
+}: {
+  endpoint: string
+  files: Array<{field: string; path: string}>
+  route: string
+}): Promise<TResult> {
+  const formData = new FormData()
+
+  for (const file of files) {
+    const bytes = await readFile(file.path)
+    formData.set(file.field, new Blob([new Uint8Array(bytes)]), basename(file.path))
+  }
+
+  let response: Response
+  try {
+    response = await fetch(`${endpoint}${route}`, {
+      body: formData,
+      method: 'POST',
+    })
+  } catch (error) {
+    throw new FilepacksError(
+      `Unable to reach preview endpoint: ${endpoint}`,
+      'Check --endpoint and confirm the private web app is running.',
+      {cause: error},
+    )
+  }
+
+  let json: TResult
+  try {
+    json = await response.json() as TResult
+  } catch (error) {
+    throw new FilepacksError(
+      `Preview endpoint returned a non-JSON response: ${endpoint}`,
+      'Use the private web app preview artifact endpoint.',
+      {cause: error},
+    )
+  }
+
+  return json
+}
+
+function basename(path: string): string {
+  return path.split(/[\\/]/).pop() ?? path
+}
+
+async function openUrl(url: string): Promise<boolean> {
+  const opener =
+    platform() === 'darwin'
+      ? {command: 'open', args: [url]}
+      : platform() === 'win32'
+        ? {command: 'cmd', args: ['/c', 'start', '', url]}
+        : {command: 'xdg-open', args: [url]}
+
+  return await new Promise(resolveOpen => {
+    const child = spawn(opener.command, opener.args, {
+      detached: true,
+      stdio: 'ignore',
+    })
+    child.once('error', () => resolveOpen(false))
+    child.once('spawn', () => {
+      child.unref()
+      resolveOpen(true)
+    })
+  })
 }
 
 function isTopLevelHelpCommand(command: string | undefined, rest: string[]): boolean {

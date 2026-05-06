@@ -170,6 +170,7 @@ test('help entrypoints return stable output and exit 0', async () => {
     '  inspect    Read artifact metadata',
     '  verify     Validate artifact integrity',
     '  compare    Structurally compare two artifacts',
+    '  push       Send artifacts to a temporary review endpoint',
     '',
     'Quick trial:',
     '  npx filepacks pack ./agent-run --output ./agent-run.fpk',
@@ -243,6 +244,19 @@ test('command-specific help entrypoints exit 0', async () => {
         '  Exit 20 means the artifacts differ, not that the CLI crashed.',
       ],
     ],
+    [
+      'push',
+      [
+        'filepacks push — send .fpk artifacts to a temporary review endpoint',
+        'Usage:',
+        '  filepacks push <artifact> --endpoint <url> [--open] [--json]',
+        '  filepacks push <baseline> <candidate> --endpoint <url> [--open] [--json]',
+        'Flags:',
+        '  --endpoint <url>  Required preview endpoint such as http://localhost:3000',
+        'Notes:',
+        '  Artifacts are processed by the preview API for the request and are not stored.',
+      ],
+    ],
   ])
 
   for (const [command, snippets] of expectations) {
@@ -254,6 +268,122 @@ test('command-specific help entrypoints exit 0', async () => {
         assert.match(result.stdout, new RegExp(escapeRegExp(snippet)))
       }
     }
+  }
+})
+
+test('push validates endpoint and artifact arguments', async () => {
+  const missingEndpoint = await run(['push', 'candidate.fpk'])
+  assert.equal(missingEndpoint.exitCode, 1)
+  assert.match(missingEndpoint.stderr, /Usage: filepacks push <artifact> --endpoint <url>/)
+
+  const invalidEndpoint = await run(['push', 'candidate.fpk', '--endpoint', 'localhost:3000', '--json'])
+  assert.equal(invalidEndpoint.exitCode, 1)
+  const json = JSON.parse(invalidEndpoint.stdout)
+  assert.equal(json.command, 'push')
+  assert.equal(json.ok, false)
+  assert.equal(json.error.code, 'invalid_endpoint')
+})
+
+test('push sends one artifact to temporary verify endpoint with json output', async () => {
+  const tempRoot = await mkdtemp(join(tmpdir(), 'filepacks-v0-cli-push-single-'))
+  const endpoint = 'http://preview.example'
+  const fetchMock = mockFetch({
+    filesChecked: 1,
+    mismatches: [],
+    ok: true,
+    operation: 'verify',
+    preview: true,
+  })
+
+  try {
+    const input = join(tempRoot, 'candidate-output')
+    const artifact = join(tempRoot, 'candidate.fpk')
+    await mkdir(input, {recursive: true})
+    await writeFile(join(input, 'result.txt'), 'ok\n')
+    assert.equal((await run(['pack', input, '--output', artifact])).exitCode, 0)
+
+    const result = await withFetchMock(fetchMock, () =>
+      run(['push', artifact, '--endpoint', endpoint, '--json']),
+    )
+    assert.equal(result.exitCode, 0)
+    assert.equal(fetchMock.calls.length, 1)
+    assert.equal(fetchMock.calls[0].url, `${endpoint}/api/preview/artifacts/verify`)
+    assert.equal(fetchMock.calls[0].method, 'POST')
+    assert.deepEqual(fetchMock.calls[0].fields, ['artifact'])
+
+    const json = JSON.parse(result.stdout)
+    assert.equal(json.command, 'push')
+    assert.equal(json.ok, true)
+    assert.equal(json.mode, 'temporary_review')
+    assert.equal(json.stored, false)
+    assert.equal(json.endpoint, endpoint)
+    assert.equal(json.opened, false)
+    const payload = decodeReviewUrl(json.reviewUrl)
+    assert.equal(payload.type, 'single_artifact_review')
+    assert.equal(payload.stored, false)
+    assert.equal(payload.artifact.name, 'candidate-output')
+    assert.deepEqual(payload.verification, {filesChecked: 1, mismatches: [], ok: true})
+  } finally {
+    await rm(tempRoot, {force: true, recursive: true})
+  }
+})
+
+test('push sends baseline and candidate to temporary compare endpoint', async () => {
+  const tempRoot = await mkdtemp(join(tmpdir(), 'filepacks-v0-cli-push-compare-'))
+  const endpoint = 'http://preview.example'
+  const fetchMock = mockFetch({
+    files: {
+      added: ['added.txt'],
+      changed: ['changed.txt'],
+      removed: ['removed.txt'],
+    },
+    ok: false,
+    operation: 'compare',
+    preview: true,
+    summary: {
+      added: 1,
+      changed: 1,
+      removed: 1,
+    },
+  })
+
+  try {
+    const baselineInput = join(tempRoot, 'baseline-output')
+    const candidateInput = join(tempRoot, 'candidate-output')
+    const baseline = join(tempRoot, 'baseline.fpk')
+    const candidate = join(tempRoot, 'candidate.fpk')
+    await mkdir(baselineInput, {recursive: true})
+    await mkdir(candidateInput, {recursive: true})
+    await writeFile(join(baselineInput, 'changed.txt'), 'old\n')
+    await writeFile(join(baselineInput, 'removed.txt'), 'remove\n')
+    await writeFile(join(candidateInput, 'changed.txt'), 'new\n')
+    await writeFile(join(candidateInput, 'added.txt'), 'added\n')
+    assert.equal((await run(['pack', baselineInput, '--output', baseline])).exitCode, 0)
+    assert.equal((await run(['pack', candidateInput, '--output', candidate])).exitCode, 0)
+
+    const result = await withFetchMock(fetchMock, () =>
+      run(['push', baseline, candidate, '--endpoint', endpoint]),
+    )
+    assert.equal(result.exitCode, 0)
+    assert.equal(fetchMock.calls.length, 1)
+    assert.equal(fetchMock.calls[0].url, `${endpoint}/api/preview/artifacts/compare`)
+    assert.equal(fetchMock.calls[0].method, 'POST')
+    assert.deepEqual(fetchMock.calls[0].fields, ['baseline', 'candidate'])
+    assert.match(result.stdout, /mode=temporary_compare_review\n/)
+    assert.match(result.stdout, /stored=false\n/)
+    assert.match(result.stdout, /added=1\n/)
+    assert.match(result.stdout, /changed=1\n/)
+    assert.match(result.stdout, /removed=1\n/)
+
+    const reviewUrl = result.stdout.match(/review_url=(.+)\n/)?.[1]
+    assert.ok(reviewUrl)
+    const payload = decodeReviewUrl(reviewUrl)
+    assert.equal(payload.type, 'artifact_compare_review')
+    assert.equal(payload.stored, false)
+    assert.deepEqual(payload.comparison.summary, {added: 1, changed: 1, removed: 1})
+    assert.deepEqual(payload.comparison.files.changed, ['changed.txt'])
+  } finally {
+    await rm(tempRoot, {force: true, recursive: true})
   }
 })
 
@@ -275,4 +405,37 @@ test('pack rejects output paths without .fpk extension', async () => {
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function mockFetch(payload) {
+  const calls = []
+  const fetch = async (url, init) => {
+    calls.push({
+      fields: Array.from(init.body.keys()),
+      method: init.method,
+      url: String(url),
+    })
+
+    return {
+      json: async () => payload,
+    }
+  }
+
+  fetch.calls = calls
+  return fetch
+}
+
+async function withFetchMock(fetchMock, callback) {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = fetchMock
+  try {
+    return await callback()
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+}
+
+function decodeReviewUrl(reviewUrl) {
+  const encoded = new URL(reviewUrl).hash.replace(/^#review=/, '')
+  return JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'))
 }

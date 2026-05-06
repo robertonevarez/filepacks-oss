@@ -110,6 +110,16 @@ npx filepacks compare ./accepted-run.fpk ./run-42.fpk
 
 This reduces ambiguity because the review starts from a deterministic file, not a paraphrased summary of what the agent claims it produced.
 
+For demos with a preview review app, the experimental `push` command can hand off the result directly:
+
+```bash
+npx filepacks push ./accepted-run.fpk ./run-42.fpk \
+  --endpoint http://localhost:3000 \
+  --open
+```
+
+`push` means temporary review handoff. The CLI verifies artifacts locally, sends them to the preview API for the current request, and opens `/app#review=...` with a compact result summary. The fragment does not contain artifact contents, and the preview API does not store artifacts, create a registry, or create workspace state.
+
 ## Pattern: embed filepacks in a harness
 
 Use CLI `--json` when the workflow shells out to `filepacks`. Use [`@filepacks/core`](/programmatic-api) when the workflow already runs inside Node.js:

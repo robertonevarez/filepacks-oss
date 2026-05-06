@@ -1,6 +1,6 @@
 ---
 title: Overview
-description: The four public CLI commands, when to use each one, and how the CLI maps to @filepacks/core.
+description: The public CLI commands, when to use each one, and how the CLI maps to @filepacks/core.
 ---
 
 The current public CLI is intentionally narrow.
@@ -12,6 +12,8 @@ filepacks pack <input> --output <file>
 filepacks inspect <file>
 filepacks verify <file>
 filepacks compare <baseline> <candidate>
+filepacks push <artifact> --endpoint <url> [--open]
+filepacks push <baseline> <candidate> --endpoint <url> [--open]
 ```
 
 Unsupported commands are not part of the public OSS surface, including `show`, `import`, `registry`, `list`, `tag`, `baseline`, `unpack`, and `config`.
@@ -24,6 +26,7 @@ Unsupported commands are not part of the public OSS surface, including `show`, `
 | read the artifact summary | `filepacks inspect <file>` |
 | confirm the artifact is intact | `filepacks verify <file>` |
 | see whether packaged files changed | `filepacks compare <baseline> <candidate>` |
+| send artifacts to a temporary review endpoint | `filepacks push <baseline> <candidate> --endpoint <url>` |
 
 ## Global help
 
@@ -44,6 +47,7 @@ filepacks pack --help
 filepacks inspect --help
 filepacks verify --help
 filepacks compare --help
+filepacks push --help
 ```
 
 ## Command behavior summary
@@ -54,6 +58,7 @@ filepacks compare --help
 | `inspect` | Read artifact metadata from a `.fpk` file | `0` on success, `1` on usage or file errors |
 | `verify` | Check payload files against the manifest | `0` when valid, `1` when invalid or on usage/file errors |
 | `compare` | Structurally compare two artifacts | `0` when identical, `20` when different, `1` on usage/file errors |
+| `push` | Send artifacts to a preview endpoint for temporary review handoff | `0` when the review handoff succeeds, `1` on usage/path/network/API errors |
 
 ## Output style
 
@@ -65,6 +70,7 @@ Examples:
 - `inspect` prints `path=`, `name=`, `version=`, `digest=`, `files=`, `bytes=`
 - `verify` prints `ok=true` or `ok=false`
 - `compare` prints `ok=`, summary counts, and per-file change lines
+- `push` prints `mode=temporary_review` or `mode=temporary_compare_review`, `stored=false`, the endpoint, and a review URL
 
 Add `--json` when an agent, CI job, or script needs structured output:
 
@@ -73,9 +79,12 @@ filepacks pack ./run-output --output ./run.fpk --json
 filepacks inspect ./run.fpk --json
 filepacks verify ./run.fpk --json
 filepacks compare ./baseline.fpk ./run.fpk --json
+filepacks push ./baseline.fpk ./run.fpk --endpoint http://localhost:3000 --json
 ```
 
-JSON mode preserves the same exit-code behavior as human output. For example, `compare --json` still exits `20` when artifacts differ.
+JSON mode preserves the same exit-code behavior as human output. For example, `compare --json` still exits `20` when artifacts differ. `push --json` exits `0` when the temporary review handoff succeeds, even when the comparison itself reports differences.
+
+`push` is experimental and means temporary review handoff. It verifies local artifacts, posts them to a preview review endpoint for the request, and can open `/app#review=...` with a small encoded result summary. It does not store artifacts, create registry records, create workspaces, or provide cloud sync.
 
 ## Recommended flow
 
@@ -96,5 +105,6 @@ The CLI is a conservative wrapper around `@filepacks/core`:
 - CLI `inspect` -> `inspect()`
 - CLI `verify` -> `verify()`
 - CLI `compare` -> `compare()`
+- CLI `push` -> local `inspect()`/`verify()` plus a preview endpoint request
 
 Use CLI `--json` when you need structured results from a shell command. Use the core package when you already run inside Node.js.

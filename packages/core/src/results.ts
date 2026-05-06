@@ -80,11 +80,33 @@ export type CompareJsonResult =
       ok: false
     }
 
+export type PushJsonResult =
+  | {
+      command: 'push'
+      endpoint: string
+      mode: 'temporary_review' | 'temporary_compare_review'
+      ok: true
+      opened: boolean
+      reviewUrl: string
+      stored: false
+      summary?: {
+        added: number
+        changed: number
+        removed: number
+      }
+    }
+  | {
+      command: 'push'
+      error: ArtifactJsonError
+      ok: false
+    }
+
 export type CliJsonResult =
   | PackJsonResult
   | InspectJsonResult
   | VerifyJsonResult
   | CompareJsonResult
+  | PushJsonResult
 
 export type ArtifactApiErrorResult = {
   error: ArtifactJsonError

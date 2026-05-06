@@ -44,6 +44,16 @@ This is the core review loop for repeated runs:
 - `20` means one or more packaged files changed
 - `1` means command or artifact failure
 
+To hand the comparison to a human review app during a demo, use the experimental temporary review handoff:
+
+```bash
+npx filepacks push ./baseline.fpk ./candidate.fpk \
+  --endpoint http://localhost:3000 \
+  --open
+```
+
+`push` verifies the artifacts locally, sends them to the preview compare endpoint for the request, receives a structured summary, and opens `/app#review=...`. The fragment contains summary metadata and changed file paths only, not artifact contents. The preview endpoint does not store the artifacts.
+
 ## Workflow: received artifact from someone else
 
 When someone hands you a `.fpk` file:
@@ -115,9 +125,10 @@ npx filepacks pack ./demo/candidate --output ./candidate.fpk
 npx filepacks inspect ./candidate.fpk
 npx filepacks verify ./candidate.fpk
 npx filepacks compare ./baseline.fpk ./candidate.fpk
+npx filepacks push ./baseline.fpk ./candidate.fpk --endpoint http://localhost:3000 --open
 ```
 
-That flow shows why filepacks matters for AI-assisted software work: one portable artifact preserves the agent's files, `verify` confirms they still match the manifest, and `compare` shows exactly what changed before a human decides whether to ship.
+That flow shows why filepacks matters for AI-assisted software work: one portable artifact preserves the agent's files, `verify` confirms they still match the manifest, `compare` shows exactly what changed, and `push` hands a temporary review result to a human-facing app without creating storage or registry behavior.
 
 ## Workflow: choose the right command
 
@@ -127,5 +138,6 @@ That flow shows why filepacks matters for AI-assisted software work: one portabl
 | Read the artifact summary | `inspect` |
 | Confirm the artifact is intact | `verify` |
 | Check whether packaged files changed | `compare` |
+| Hand off to a temporary review app | `push` |
 
 Continue to the individual command pages for argument and output details.

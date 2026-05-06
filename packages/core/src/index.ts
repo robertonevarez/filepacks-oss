@@ -13,6 +13,7 @@ export type {
   CompareJsonResult,
   InspectJsonResult,
   PackJsonResult,
+  PushJsonResult,
   VerifyJsonResult,
 } from './results.js'
 export type {VerificationMismatch, VerificationMismatchCode, VerifyArtifactResult} from './verify-artifact.js'
