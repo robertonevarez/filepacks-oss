@@ -4,4 +4,15 @@ export type {CompareInput, InspectInput, PackInput, PackResult} from './public-a
 export type {CompareFileAdded, CompareFileChanged, CompareFileRemoved, StructuralCompareArtifactsResult} from './compare-artifacts.js'
 export type {Manifest, ManifestFile} from './manifest.js'
 export type {PayloadFile, ReadArtifactResult} from './read-artifact.js'
+export type {
+  ArtifactApiErrorResult,
+  ArtifactApiSuccessResult,
+  ArtifactJsonError,
+  ArtifactSummary,
+  CliJsonResult,
+  CompareJsonResult,
+  InspectJsonResult,
+  PackJsonResult,
+  VerifyJsonResult,
+} from './results.js'
 export type {VerificationMismatch, VerificationMismatchCode, VerifyArtifactResult} from './verify-artifact.js'

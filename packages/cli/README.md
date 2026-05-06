@@ -28,6 +28,15 @@ filepacks verify <file>
 filepacks compare <baseline> <candidate>
 ```
 
+Add `--json` to any command when an agent, CI job, or script needs structured output:
+
+```bash
+filepacks pack <input> --output <file> --json
+filepacks inspect <file> --json
+filepacks verify <file> --json
+filepacks compare <baseline> <candidate> --json
+```
+
 ## First useful workflow
 
 ```bash
@@ -43,6 +52,7 @@ npx filepacks compare ./baseline.fpk ./run.fpk
 - `inspect` prints `path=`, `name=`, `version=`, `digest=`, `files=`, `bytes=`
 - `verify` prints `ok=true` or `ok=false`
 - `compare` exits `0` for identical artifacts and `20` for structural differences
+- `--json` prints one parseable JSON object with `ok`, command-specific fields, and structured errors when practical
 
 ## When to use the CLI
 
