@@ -1,0 +1,120 @@
+---
+title: Programmatic API
+description: Use @filepacks/core to pack, inspect, verify, and compare .fpk artifacts from Node.js tools and automation.
+---
+
+`@filepacks/core` is the current programmatic API for filepacks artifact workflows.
+
+Use it when a runner, harness, CI helper, or agent tool already runs inside Node.js and needs structured results without parsing CLI output.
+
+## Available today
+
+The package exposes the same artifact primitives as the public CLI:
+
+- `pack()` creates a deterministic `.fpk` artifact from a directory
+- `inspect()` reads artifact metadata and manifest entries
+- `verify()` checks the payload against the manifest
+- `compare()` structurally compares baseline and candidate artifacts
+
+The stable current surfaces are the `.fpk` artifact format, the `filepacks` CLI, and `@filepacks/core`. The package is not a hosted API client.
+
+## Install
+
+```bash
+npm install @filepacks/core
+```
+
+## Minimal workflow
+
+```ts
+import {pack, inspect, verify, compare} from '@filepacks/core'
+
+const artifactPath = '/tmp/run.fpk'
+
+await pack({
+  input: '/tmp/run-output',
+  output: artifactPath,
+})
+
+const artifact = await inspect({
+  artifact: artifactPath,
+})
+
+const verification = await verify({
+  artifact: artifactPath,
+})
+
+const diff = await compare({
+  baseline: '/tmp/baseline.fpk',
+  candidate: artifactPath,
+})
+```
+
+## Return values
+
+`pack()` returns the output path, input directory, manifest, and archive digest.
+
+`inspect()` returns the manifest, payload file entries, and archive digest.
+
+`verify()` returns `ok`, mismatch details, and checked file count.
+
+`compare()` returns `ok`, summary counts, and per-file added, removed, and changed details.
+
+## Common use cases
+
+Use `@filepacks/core` when you want to:
+
+- package agent output at the end of a run
+- verify a `.fpk` before handing it to another tool
+- compare eval or regression outputs inside a test harness
+- store structured artifact metadata in your own workflow
+- build review automation without shelling out to the CLI
+
+## Example: fail on verification mismatch
+
+```ts
+import {pack, verify} from '@filepacks/core'
+
+const result = await pack({
+  input: './agent-output',
+  output: './run.fpk',
+})
+
+const verification = await verify({artifact: result.outputPath})
+
+if (!verification.ok) {
+  throw new Error(`Artifact verification failed: ${verification.mismatches.length} mismatch(es)`)
+}
+```
+
+## Example: compare repeated runs
+
+```ts
+import {compare} from '@filepacks/core'
+
+const diff = await compare({
+  baseline: './accepted-run.fpk',
+  candidate: './candidate-run.fpk',
+})
+
+if (!diff.ok) {
+  console.log(diff.summary)
+  console.log(diff.changed)
+}
+```
+
+## Planned platform direction
+
+A future hosted API may coordinate team review state, agent handoff, policy checks, and workflow metadata around verified artifacts.
+
+That hosted coordination layer is not part of the current v0 OSS surface. The current public surface does not include hosted API routes, registry behavior, remote storage, auth, workspaces, sync, or billing.
+
+Start with the local artifact contract: create a `.fpk`, verify it, and compare it explicitly.
+
+## Related pages
+
+- [Quickstart](/quickstart)
+- [Concepts](/concepts)
+- [Agent workflows](/agent-workflows)
+- [CI/CD Integration](/ci-cd-integration)
+- [CLI workflows](/cli/workflows)
