@@ -13,6 +13,7 @@ It is the command to use when you care about repeated-run drift, baseline-versus
 
 ```bash
 filepacks compare <baseline> <candidate>
+filepacks compare <baseline> <candidate> --json
 ```
 
 ## When to use it
@@ -54,6 +55,27 @@ removed=0
 changed=1
 added_file=reports/new.txt
 changed_file=summary.txt
+```
+
+With `--json`, `compare` prints one JSON object and keeps the same exit behavior:
+
+```json
+{
+  "command": "compare",
+  "ok": false,
+  "baseline": "/absolute/path/to/baseline.fpk",
+  "candidate": "/absolute/path/to/candidate.fpk",
+  "summary": {
+    "added": 1,
+    "changed": 1,
+    "removed": 0
+  },
+  "files": {
+    "added": ["reports/new.txt"],
+    "changed": ["summary.txt"],
+    "removed": []
+  }
+}
 ```
 
 ## Exit behavior

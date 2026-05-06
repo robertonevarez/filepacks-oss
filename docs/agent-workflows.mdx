@@ -19,6 +19,31 @@ npx filepacks verify ./run-42.fpk
 
 That gives the run a stable artifact identity and a canonical manifest.
 
+Use `--json` when another agent, CI job, or script needs to consume the result without scraping terminal text:
+
+```bash
+npx filepacks pack ./agent-output --output ./run-42.fpk --json
+npx filepacks inspect ./run-42.fpk --json
+npx filepacks verify ./run-42.fpk --json
+```
+
+Example `inspect --json` output:
+
+```json
+{
+  "command": "inspect",
+  "ok": true,
+  "path": "/absolute/path/to/run-42.fpk",
+  "artifact": {
+    "name": "agent-output",
+    "formatVersion": 1,
+    "digest": "sha256:...",
+    "fileCount": 4,
+    "totalBytes": 12345
+  }
+}
+```
+
 ## Pattern: compare against an accepted baseline
 
 Keep one explicit baseline artifact and compare new runs against it:
@@ -34,6 +59,33 @@ Interpret the result like this:
 - exit `1`: the command failed or an artifact could not be read
 
 The public OSS CLI does not resolve baseline aliases or tags for you. Use explicit file paths.
+
+For automation, prefer JSON output:
+
+```bash
+npx filepacks compare ./accepted-run.fpk ./run-42.fpk --json
+```
+
+Example changed result:
+
+```json
+{
+  "command": "compare",
+  "ok": false,
+  "baseline": "/absolute/path/to/accepted-run.fpk",
+  "candidate": "/absolute/path/to/run-42.fpk",
+  "summary": {
+    "added": 1,
+    "changed": 2,
+    "removed": 0
+  },
+  "files": {
+    "added": ["new-report.md"],
+    "changed": ["results.json", "trace.log"],
+    "removed": []
+  }
+}
+```
 
 ## Pattern: use artifacts as durable evidence
 
@@ -60,7 +112,7 @@ This reduces ambiguity because the review starts from a deterministic file, not 
 
 ## Pattern: embed filepacks in a harness
 
-Use [`@filepacks/core`](/programmatic-api) when the workflow already runs inside Node.js:
+Use CLI `--json` when the workflow shells out to `filepacks`. Use [`@filepacks/core`](/programmatic-api) when the workflow already runs inside Node.js:
 
 ```ts
 import {pack, compare, verify} from '@filepacks/core'
@@ -71,6 +123,12 @@ const diff = await compare({baseline: baselineArtifact, candidate: artifactPath}
 ```
 
 That gives a harness structured results without parsing CLI output.
+
+## Hosted review layer
+
+The current public surface is local-first: the `.fpk` artifact format, the `filepacks` CLI, and `@filepacks/core`.
+
+A hosted review or API layer can be built around uploaded artifacts later, but it is not part of the public v0 OSS surface. Do not assume registry behavior, durable upload URLs, API keys, workspaces, or cloud storage from these examples.
 
 ## What filepacks helps agents do better
 

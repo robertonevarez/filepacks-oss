@@ -13,6 +13,7 @@ Use it whenever a workflow finishes producing files and you want one portable ar
 
 ```bash
 filepacks pack <input> --output <file>
+filepacks pack <input> --output <file> --json
 ```
 
 ## When to use it
@@ -26,8 +27,9 @@ filepacks pack <input> --output <file>
 
 - `<input>`: input directory to package
 - `--output <file>`: required output path for the `.fpk` artifact; it must end in `.fpk`
+- `--json`: optional structured output for agents, CI jobs, and scripts
 
-`pack` is the only public CLI command with a flag today, and `--output` is required.
+`--output` is required.
 
 ## Minimal example
 
@@ -50,6 +52,23 @@ bytes=12
 ```
 
 The artifact name defaults to the input directory basename in the CLI.
+
+With `--json`, `pack` prints one JSON object:
+
+```json
+{
+  "command": "pack",
+  "ok": true,
+  "inputDirectory": "/absolute/path/to/run-output",
+  "outputPath": "/absolute/path/to/run-output.fpk",
+  "artifact": {
+    "name": "run-output",
+    "digest": "sha256:...",
+    "fileCount": 2,
+    "totalBytes": 12
+  }
+}
+```
 
 ## Common mistakes
 

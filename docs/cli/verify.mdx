@@ -13,6 +13,7 @@ Use it before you upload an artifact, hand it to someone else, or use it as a ba
 
 ```bash
 filepacks verify <file>
+filepacks verify <file> --json
 ```
 
 ## When to use it
@@ -61,6 +62,18 @@ Verify
 path=/absolute/path/to/artifact.fpk
 ok=false
 error=hash_mismatch:Hash mismatch for: summary.txt
+```
+
+With `--json`, `verify` prints one JSON object:
+
+```json
+{
+  "command": "verify",
+  "ok": true,
+  "path": "/absolute/path/to/artifact.fpk",
+  "filesChecked": 2,
+  "mismatches": []
+}
 ```
 
 ## Exit behavior

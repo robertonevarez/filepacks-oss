@@ -13,6 +13,7 @@ Use it when you want a quick read on what an artifact claims to contain before d
 
 ```bash
 filepacks inspect <file>
+filepacks inspect <file> --json
 ```
 
 ## When to use it
@@ -24,6 +25,7 @@ filepacks inspect <file>
 ## Arguments
 
 - `<file>`: path to an existing `.fpk` artifact
+- `--json`: optional structured output for agents, CI jobs, and scripts
 
 The current CLI requires the path to end in `.fpk`.
 
@@ -55,6 +57,23 @@ bytes=12
 - archive digest
 - file count
 - total bytes
+
+With `--json`, `inspect` prints one JSON object with the artifact summary:
+
+```json
+{
+  "command": "inspect",
+  "ok": true,
+  "path": "/absolute/path/to/artifact.fpk",
+  "artifact": {
+    "name": "artifact",
+    "formatVersion": 1,
+    "digest": "sha256:...",
+    "fileCount": 2,
+    "totalBytes": 12
+  }
+}
+```
 
 ## Common mistakes
 

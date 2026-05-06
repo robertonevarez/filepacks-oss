@@ -57,7 +57,7 @@ filepacks compare --help
 
 ## Output style
 
-The CLI uses line-oriented plain text output rather than JSON. That makes it easy to read in a terminal and easy to consume from shell scripts.
+The CLI uses line-oriented plain text output by default. That keeps the commands readable in a terminal and stable for simple shell workflows.
 
 Examples:
 
@@ -65,6 +65,17 @@ Examples:
 - `inspect` prints `path=`, `name=`, `version=`, `digest=`, `files=`, `bytes=`
 - `verify` prints `ok=true` or `ok=false`
 - `compare` prints `ok=`, summary counts, and per-file change lines
+
+Add `--json` when an agent, CI job, or script needs structured output:
+
+```bash
+filepacks pack ./run-output --output ./run.fpk --json
+filepacks inspect ./run.fpk --json
+filepacks verify ./run.fpk --json
+filepacks compare ./baseline.fpk ./run.fpk --json
+```
+
+JSON mode preserves the same exit-code behavior as human output. For example, `compare --json` still exits `20` when artifacts differ.
 
 ## Recommended flow
 
@@ -86,4 +97,4 @@ The CLI is a conservative wrapper around `@filepacks/core`:
 - CLI `verify` -> `verify()`
 - CLI `compare` -> `compare()`
 
-Use the core package when you need structured results in code.
+Use CLI `--json` when you need structured results from a shell command. Use the core package when you already run inside Node.js.
