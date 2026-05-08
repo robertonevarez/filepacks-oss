@@ -1,0 +1,27 @@
+--- scripts/list_test_packages.py
++++ scripts/list_test_packages.py
+@@ -4,6 +4,7 @@
+ import subprocess
+ import sys
+ import tempfile
++import shutil
+ from concurrent.futures import ThreadPoolExecutor, as_completed
+ from pathlib import Path
+ from typing import Any
+@@ -109,7 +110,15 @@
+     test_package_option_string = " (no-deps)" if no_deps else ""
+     verbose_this_iteration = False
+     with tempfile.TemporaryDirectory() as download_dir:
+-        cmd_list = ["pip", "download"] + (["--no-deps"] if no_deps else []) + [test_package["spec"], "-d", download_dir]
++        # Prefer an on-path 'pip' executable, but fall back to invoking
++        # the venv's Python with '-m pip' when 'pip' is not available.
++        pip_exe = shutil.which("pip")
++        if pip_exe:
++            base_cmd = [pip_exe, "download"]
++        else:
++            base_cmd = [sys.executable, "-m", "pip", "download"]
++
++        cmd_list = base_cmd + (["--no-deps"] if no_deps else []) + [test_package["spec"], "-d", download_dir]
+         if verbose:
+             print(f"CMD: {' '.join(cmd_list)}")
+         pip_download_process = subprocess.run(cmd_list, capture_output=True, text=True, check=False)

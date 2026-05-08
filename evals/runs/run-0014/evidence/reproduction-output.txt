@@ -1,0 +1,18 @@
+THROW: Unknown commands: fly, away
+file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/test/repro-2481.mjs:25
+        throw new Error(msg);
+              ^
+
+Error: Unknown commands: fly, away
+    at file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/test/repro-2481.mjs:25:15
+    at Object.fail (file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/build/lib/usage.js:39:21)
+    at Object.unknownCommands (file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/build/lib/validation.js:127:19)
+    at file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/build/lib/yargs-factory.js:1488:101
+    at file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/build/lib/yargs-factory.js:1188:13
+    at maybeAsyncResult (file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/build/lib/utils/maybe-async-result.js:9:15)
+    at [validateAsync] (file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/build/lib/yargs-factory.js:1187:16)
+    at [runYargsParserAndExecuteCommands] (file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/build/lib/yargs-factory.js:1462:55)
+    at YargsInstance.parse (file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/build/lib/yargs-factory.js:704:63)
+    at YargsInstance.parseSync (file:///Users/robertonevarez/projects/filepacks/filepacks-oss/evals/workspaces/run-0014/yargs/build/lib/yargs-factory.js:740:35)
+
+Node.js v25.9.0

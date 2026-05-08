@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.filepacks.dev/evals/candidate-issue.schema.json",
+  "title": "filepacks eval candidate issues",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "id",
+      "repo_id",
+      "issue_url",
+      "issue_title",
+      "issue_type",
+      "complexity",
+      "reproducibility",
+      "validation_method",
+      "expected_files_changed_range",
+      "status",
+      "notes"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+      "repo_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+      "issue_url": {"type": "string", "pattern": "^https://github\\.com/[^/]+/[^/]+/issues/[0-9]+$"},
+      "issue_title": {"type": "string", "minLength": 1},
+      "issue_type": {
+        "type": "string",
+        "enum": ["bugfix", "refactor", "docs_update", "ci_fix", "test_repair", "other"]
+      },
+      "complexity": {
+        "type": "string",
+        "enum": ["small", "medium"]
+      },
+      "reproducibility": {
+        "type": "string",
+        "enum": ["confirmed", "documented", "not_reproduced", "unknown"]
+      },
+      "validation_method": {"type": "string", "minLength": 1},
+      "expected_files_changed_range": {"type": "string", "pattern": "^[0-9]+-[0-9]+$"},
+      "preflight_status": {
+        "type": "string",
+        "enum": ["selected", "deferred", "rejected", "unverified"]
+      },
+      "selected_for_batch": {"type": "boolean"},
+      "selection_rationale": {"type": "string"},
+      "local_setup_verified": {
+        "type": "string",
+        "enum": ["verified", "partial", "blocked", "not_checked"]
+      },
+      "validation_command": {"type": "string"},
+      "reproducibility_notes": {"type": "string"},
+      "deferred_reason": {"type": "string"},
+      "status": {
+        "type": "string",
+        "enum": ["candidate", "preflighted", "selected", "rejected"]
+      },
+      "notes": {"type": "string"}
+    }
+  }
+}

@@ -1,0 +1,8 @@
+Options:
+  --help           Show help                                           [boolean]
+  --version        Show version number                                 [boolean]
+  --auth.username                                                       [string]
+  --auth.password                                                       [string]
+  --config         Path to JSON config file
+
+Unknown argument: auth

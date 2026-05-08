@@ -1,0 +1,22 @@
+diff --git a/lib/stringify.js b/lib/stringify.js
+index 72960a9..5e6d119 100644
+--- a/lib/stringify.js
++++ b/lib/stringify.js
+@@ -157,6 +157,17 @@ var stringify = function stringify(
+     var adjustedPrefix = commaRoundTrip && isArray(obj) && obj.length === 1 ? encodedPrefix + '[]' : encodedPrefix;
+ 
+     if (allowEmptyArrays && isArray(obj) && obj.length === 0) {
++        // For comma arrayFormat, represent an empty array as an empty value ("foo=")
++        // rather than the usual brackets notation ("foo[]"). Other formats keep the
++        // existing behavior for backward compatibility.
++        if (generateArrayPrefix === 'comma') {
++            if (encoder) {
++                var keyValue = encodeValuesOnly ? prefix : encoder(prefix, defaults.encoder, charset, 'key', format);
++                return formatter(keyValue) + '=';
++            }
++            return formatter(prefix) + '=';
++        }
++
+         return adjustedPrefix + '[]';
+     }
+ 

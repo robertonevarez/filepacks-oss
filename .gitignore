@@ -16,3 +16,7 @@ apps/web/.next/
 *.fpk
 !spec/examples/**/*.fpk
 !evals/runs/**/*.fpk
+
+# Local external OSS evaluation workspaces.
+# Cloned candidate repositories must not be committed.
+evals/workspaces/

@@ -1,0 +1,10 @@
+argv keys: [ '_', 'config', 'auth', '$0' ]
+{
+  "_": [],
+  "config": "/tmp/auth-config.json",
+  "auth": {
+    "username": "test",
+    "password": "test"
+  },
+  "$0": "/tmp/repro-auth2.js"
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.filepacks.dev/evals/candidate-repo.schema.json",
+  "title": "filepacks eval candidate repositories",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "id",
+      "name",
+      "url",
+      "license",
+      "primary_language",
+      "last_activity_checked_at",
+      "setup_command",
+      "test_command",
+      "build_command",
+      "notes",
+      "status"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+      "name": {"type": "string", "minLength": 1},
+      "url": {"type": "string", "pattern": "^https://github\\.com/[^/]+/[^/]+$"},
+      "license": {"type": "string", "minLength": 1},
+      "primary_language": {"type": "string", "minLength": 1},
+      "last_activity_checked_at": {"type": "string", "format": "date-time"},
+      "setup_command": {"type": "string", "minLength": 1},
+      "test_command": {"type": "string", "minLength": 1},
+      "build_command": {"type": "string", "minLength": 1},
+      "notes": {"type": "string"},
+      "status": {
+        "type": "string",
+        "enum": ["candidate", "preflighted", "selected", "rejected"]
+      }
+    }
+  }
+}

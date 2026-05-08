@@ -1,0 +1,65 @@
+{
+  "id": "run-0003",
+  "batch_id": "batch-001",
+  "candidate_issue_id": "tj-commander-js-2445",
+  "issue_url": "https://github.com/tj/commander.js/issues/2445",
+  "task_type": "refactor",
+  "repository": "tj/commander.js",
+  "agent": "github-copilot-via-opencode",
+  "executor_tool": "opencode",
+  "provider": "github-copilot",
+  "model": "gpt-5-mini",
+  "model_identifier": "github-copilot/gpt-5-mini",
+  "model_substitution_reason": null,
+  "status": "completed",
+  "timestamp": "2026-05-08T00:00:00.000Z",
+  "executor_prompt": "run-0003/executor-prompt.md",
+  "executor_command": "opencode run \"$(cat evals/runs/run-0003/executor-prompt.md)\"",
+  "expected_evidence_paths": [
+    "agent-task-summary.md",
+    "issue-metadata.json",
+    "repo-metadata.json",
+    "commands-run.md",
+    "reproduction-output.txt",
+    "validation-output.txt",
+    "changes.patch",
+    "metadata.json"
+  ],
+  "notes": "Prepared for Batch 001 preflight only. This run has not been executed.",
+  "base_commit": "8247364da749736570161e95682b07fc2d72497b",
+  "base_ref": "default-branch-depth-1",
+  "environment_preflight": {
+    "checked_at": "2026-05-08T00:00:00.000Z",
+    "clone_status": "passed",
+    "clone_command": "git clone --depth 1 https://github.com/tj/commander.js /private/tmp/filepacks-batch001-env-preflight-run-0003",
+    "install_status": "passed",
+    "install_command": "npm install",
+    "baseline_status": "passed",
+    "baseline_commands": [
+      "env -u NO_COLOR npm test",
+      "npm run check"
+    ],
+    "reproduction_status": "deferred",
+    "reproduction_notes": "Issue-specific addOption behavior was not reproduced during environment preflight. Executor should create the focused failing test first.",
+    "external_repo_worktree_clean_after_preflight": true,
+    "blockers": [
+      "npm install modified package-lock.json in the temporary clone; it was restored after preflight. Executor should record or avoid install-side lockfile churn."
+    ]
+  },
+  "execution_attempt": {
+    "attempted_at": "2026-05-08T00:00:00.000Z",
+    "executor_command": "OPENCODE_CONFIG=\"$PWD/opencode.json\" opencode run \"$(cat evals/runs/run-0003/executor-prompt.md)\"",
+    "executor_tool": "opencode",
+    "provider": "github-copilot",
+    "model_identifier": "github-copilot/gpt-5-mini",
+    "result": "completed_with_artifact",
+    "failure_stage": null,
+    "failure_reason": null,
+    "artifact_created": true,
+    "artifact_path": "evals/runs/run-0003/artifact.fpk",
+    "issue_fix_attempted": true,
+    "issue_reproduced": true,
+    "model_switched": false,
+    "summary": "OpenCode reproduced the addOption multiple-options behavior with a focused test, made a minimal implementation/test change in the external workspace, ran tests and checks successfully, and packaged evidence into artifact.fpk."
+  }
+}

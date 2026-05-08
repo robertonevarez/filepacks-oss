@@ -1,0 +1,10 @@
+{
+  "artifact_digest": "8bc14225f1b9369fcf49dca8a0be396406106992b487dc26a6d2a664fc21d3ea",
+  "artifact_path": "evals/runs/run-0012/artifact.fpk",
+  "evidence_file_count": 1,
+  "evidence_path": "evals/runs/run-0012/evidence",
+  "finalized_at": "2026-05-08T17:45:56.661Z",
+  "finalized_by": "evals:finalize-run",
+  "started_at": "2026-05-08T17:45:56.654Z",
+  "verification_ok": true
+}

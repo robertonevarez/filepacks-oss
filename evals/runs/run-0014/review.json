@@ -1,0 +1,5 @@
+{
+  "reviewed": true,
+  "can_review_patch": true,
+  "notes": "Added repro scripts and ran tests. Issue reproduction unconfirmed for the exact error reported; tests show correct unknown-command behavior."
+}

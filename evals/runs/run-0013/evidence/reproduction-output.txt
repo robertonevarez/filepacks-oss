@@ -1,0 +1,11 @@
+Node version: v25.9.0
+Iterations: 20000
+Parsing benchmark: calling qs.parse on a complex query string
+Total parse time (ms): 2331.755
+Avg per parse (µs): 116.588
+
+Stringify benchmark: calling qs.stringify on a complex object
+Total stringify time (ms): 4760.975
+Avg per stringify (µs): 238.049
+
+Finished benchmark

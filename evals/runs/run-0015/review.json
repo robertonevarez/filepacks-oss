@@ -1,0 +1,10 @@
+{
+  "review": "patch",
+  "changes": [
+    "lib/validation.ts: ignore object-valued argv keys when checking unknown arguments (to avoid false positives for nested config objects).",
+    "build/lib/validation.js: built equivalent change for runtime.",
+    "Evidence files captured: reproduction-output-*.txt, options-snapshot.txt, changes.patch"
+  ],
+  "tests_run": "partial",
+  "notes": "Change is minimal and targeted. Full test run was not executed post-edit to save time; main earlier test run passed."
+}

@@ -1,0 +1,59 @@
+{
+  "id": "run-0002",
+  "batch_id": "batch-001",
+  "candidate_issue_id": "sindresorhus-ky-633",
+  "issue_url": "https://github.com/sindresorhus/ky/issues/633",
+  "task_type": "docs_update",
+  "repository": "sindresorhus/ky",
+  "agent": "github-copilot-via-opencode",
+  "executor_tool": "opencode",
+  "provider": "github-copilot",
+  "model": "gpt-5-mini",
+  "model_identifier": "github-copilot/gpt-5-mini",
+  "model_substitution_reason": null,
+  "status": "failed",
+  "timestamp": "2026-05-08T00:00:00.000Z",
+  "executor_prompt": "run-0002/executor-prompt.md",
+  "executor_command": "opencode run \"$(cat evals/runs/run-0002/executor-prompt.md)\"",
+  "expected_evidence_paths": [
+    "agent-task-summary.md",
+    "issue-metadata.json",
+    "repo-metadata.json",
+    "commands-run.md",
+    "reproduction-output.txt",
+    "validation-output.txt",
+    "changes.patch",
+    "metadata.json"
+  ],
+  "notes": "Prepared for Batch 001 preflight only. This run has not been executed.",
+  "base_commit": "61d6d66d27911001b9b4d57ab93139f9ad61384b",
+  "base_ref": "default-branch-depth-1",
+  "environment_preflight": {
+    "checked_at": "2026-05-08T00:00:00.000Z",
+    "clone_status": "passed",
+    "clone_command": "git clone --depth 1 https://github.com/sindresorhus/ky /private/tmp/filepacks-batch001-env-preflight-run-0002",
+    "install_status": "passed",
+    "install_command": "npm install",
+    "baseline_status": "passed",
+    "baseline_commands": [
+      "npm run build"
+    ],
+    "reproduction_status": "deferred",
+    "reproduction_notes": "Documentation gap was not verified in this environment preflight. Executor should inspect current docs and issue context before editing.",
+    "external_repo_worktree_clean_after_preflight": true,
+    "blockers": []
+  },
+  "execution_attempt": {
+    "attempted_at": "2026-05-08T00:00:00.000Z",
+    "executor_command": "opencode run \"$(cat evals/runs/run-0002/executor-prompt.md)\"",
+    "executor_tool": "opencode",
+    "provider": "github-copilot",
+    "model_identifier": "github-copilot/gpt-5-mini",
+    "result": "failed",
+    "failure_stage": "executor_workspace_setup",
+    "failure_reason": "OpenCode verified github-copilot/gpt-5-mini was available, then hit an auto-rejected permission request for /tmp/* before creating the approved evals/workspaces/run-0002 workspace, cloning the repo, installing dependencies, reproducing the issue, editing docs, validating, or packaging.",
+    "artifact_created": false,
+    "issue_fix_attempted": false,
+    "model_switched": false
+  }
+}

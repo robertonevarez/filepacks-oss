@@ -1,0 +1,17 @@
+{
+  "decision": "needs_review",
+  "confidence": null,
+  "review_started_at": null,
+  "review_ended_at": null,
+  "review_duration_minutes": null,
+  "missing_context_count": 0,
+  "clarification_request_count": 0,
+  "missed_regression_count": 0,
+  "re_review_count": 0,
+  "reusable_by_another_agent": null,
+  "reproduction_success": null,
+  "time_to_understand_minutes": null,
+  "notes": [
+    "Run not executed. Review pending future artifact."
+  ]
+}

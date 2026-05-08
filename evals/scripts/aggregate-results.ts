@@ -13,6 +13,7 @@ type RunMetadata = {
   expected_evidence_paths?: string[]
   id: string
   repository: string
+  status?: string
   task_type: string
 }
 
@@ -38,6 +39,7 @@ type TimingMetadata = {
 }
 
 type RunSummary = {
+  artifact_tgz_present: boolean
   id: string
   measurement?: RunEvidenceMeasurement
   paths: {
@@ -47,12 +49,22 @@ type RunSummary = {
   }
   repository: string
   review: ReviewMetadata
+  status: string
   task_type: string
   timing: TimingMetadata
   warnings: string[]
 }
 
 type AggregateReport = {
+  current_state: {
+    completed_runs: number
+    incomplete_measured_artifacts: number
+    infra_failures: number
+    invalid_packaging_attempts: number
+    measured_artifacts: number
+    no_repro_artifacts: number
+    not_executed_runs: number
+  }
   comparison: {
     added_count: number
     baseline_count: number
@@ -130,16 +142,19 @@ async function summarizeRun(runDir: string): Promise<RunSummary> {
   const review = await readJson<ReviewMetadata>(join(runDir, 'review.json'))
   const timing = await readJson<TimingMetadata>(join(runDir, 'timing.json'))
   const artifactPath = join(runDir, 'artifact.fpk')
+  const artifactTgzPath = join(runDir, 'artifact.tgz')
   const baselinePath = join(runDir, 'baseline.fpk')
   const warnings: string[] = []
   const summary: RunSummary = {
     id: run.id,
+    artifact_tgz_present: await fileExists(artifactTgzPath),
     paths: {
       artifact: relativeFromRoot(artifactPath),
       directory: relativeFromRoot(runDir),
     },
     repository: run.repository,
     review,
+    status: run.status ?? 'unknown',
     task_type: run.task_type,
     timing,
     warnings,
@@ -196,6 +211,15 @@ function aggregate(runs: RunSummary[]): AggregateReport {
     generated_at: new Date().toISOString(),
     run_count: runs.length,
     measured_run_count: measurements.length,
+    current_state: {
+      measured_artifacts: measurements.length,
+      completed_runs: runs.filter(run => run.status === 'completed').length,
+      incomplete_measured_artifacts: runs.filter(run => run.status === 'incomplete' && run.measurement).length,
+      infra_failures: runs.filter(run => run.status === 'failed').length,
+      invalid_packaging_attempts: runs.filter(run => run.artifact_tgz_present || (run.paths.artifact && run.warnings.some(warning => warning.includes('Unable to measure') || warning.includes('malformed') || warning.includes('not a valid')))).length,
+      no_repro_artifacts: runs.filter(run => run.measurement && run.measurement.evidence.present.includes('no-changes.md')).length,
+      not_executed_runs: runs.filter(run => run.status === 'not_executed').length,
+    },
     task_type_counts: countBy(runs.map(run => run.task_type)),
     repository_counts: countBy(runs.map(run => run.repository)),
     review: {
@@ -251,16 +275,29 @@ function renderMarkdown(report: AggregateReport): string {
     `- Missing expected evidence paths: ${report.evidence.missing_count}`,
     `- Compared changed files: ${report.comparison.total_changed_files}`,
     '',
+    '## Current State',
+    '',
+    `- Measured artifacts: ${report.current_state.measured_artifacts}`,
+    `- Completed runs: ${report.current_state.completed_runs}`,
+    `- Incomplete measured artifacts: ${report.current_state.incomplete_measured_artifacts}`,
+    `- Infra failures: ${report.current_state.infra_failures}`,
+    `- Invalid packaging attempts: ${report.current_state.invalid_packaging_attempts}`,
+    `- No-repro/no-change artifacts: ${report.current_state.no_repro_artifacts}`,
+    `- Not executed runs: ${report.current_state.not_executed_runs}`,
+    '',
+    'No improvement claims are supported yet. The strongest current finding is protocol-level: deterministic finalization improved valid artifact production compared with executor-created packaging.',
+    '',
     '## Decisions',
     '',
     ...renderCountList(report.review.decisions),
     '',
     '## Runs',
     '',
-    '| Run | Task | Repo | Measured | Verify | Decision | Confidence | Missing Evidence | Changed Files |',
-    '| --- | --- | --- | --- | --- | --- | --- | --- | --- |',
+    '| Run | Status | Task | Repo | Measured | Verify | Decision | Confidence | Missing Evidence | Changed Files |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
     ...report.runs.map(run => [
       run.id,
+      run.status,
       run.task_type,
       run.repository,
       run.measurement ? 'yes' : 'no',

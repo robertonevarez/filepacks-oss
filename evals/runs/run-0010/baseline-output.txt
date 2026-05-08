@@ -1,0 +1,8 @@
+
+  ✔ main › .json() with 204 response and empty body
+  ✔ main › .json() with 204 response does not call parseJson
+  ✔ main › .json(schema) validates 204 responses as undefined
+  ✔ main › .json(schema) with 204 response does not call parseJson before validation
+  ─
+
+  4 tests passed

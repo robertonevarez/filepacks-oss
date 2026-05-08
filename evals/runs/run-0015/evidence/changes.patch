@@ -1,0 +1,60 @@
+diff --git a/lib/validation.ts b/lib/validation.ts
+index 363fdf0..5740879 100644
+--- a/lib/validation.ts
++++ b/lib/validation.ts
+@@ -145,6 +145,7 @@ export function validation(
+     isDefaultCommand,
+     checkPositionals = true
+   ) {
++    const options = yargs.getOptions();
+     const commandKeys = yargs
+       .getInternalMethods()
+       .getCommandInstance()
+@@ -153,6 +154,47 @@ export function validation(
+     const currentContext = yargs.getInternalMethods().getContext();
+ 
+     Object.keys(argv).forEach(key => {
++      // If this key came from a provided config object, treat it as known.
++      if (
++        options &&
++        Array.isArray(options.configObjects) &&
++        options.configObjects.some(c =>
++          Object.prototype.hasOwnProperty.call(c, key) ||
++          Object.prototype.hasOwnProperty.call(c, shim.Parser.camelCase(key))
++        )
++      ) {
++        return;
++      }
++
++      // Treat nested object values (from config files) as known to avoid
++      // strict-mode false positives for grouped config keys like --config.
++      if (typeof argv[key] === 'object' && argv[key] !== null) {
++        return;
++      }
++
++      // If the argv value is a nested object (eg. { auth: { username: ... } })
++      // and we have configured options that reference nested keys (eg. auth.username),
++      // treat the parent object key as known.
++      if (typeof argv[key] === 'object' && argv[key] !== null) {
++        const opts = yargs.getOptions();
++        const hintSources = [
++          opts.alias || {},
++          opts.default || {},
++          opts.coerce || {},
++          opts.narg || {},
++          (opts.array || []).reduce((acc: any, a: any) => {
++            if (typeof a === 'string') acc[a] = true;
++            else if (a && a.key) acc[a.key] = true;
++            return acc;
++          }, {}),
++          opts.boolean || {},
++          opts.string || {},
++          opts.number || {},
++        ];
++        const hintKeys = Object.keys(Object.assign({}, ...hintSources));
++        if (hintKeys.some(hk => hk.indexOf(key + '.') === 0)) return;
++      }
++
+       if (
+         !specialKeys.includes(key) &&
+         !Object.prototype.hasOwnProperty.call(positionalMap, key) &&

@@ -1,0 +1,7 @@
+{
+  "repo": "https://github.com/sindresorhus/ky",
+  "clean_commit": "61d6d66d27911001b9b4d57ab93139f9ad61384b",
+  "checked_out_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "node_version": "v25.9.0",
+  "npm_version": "11.12.1"
+}

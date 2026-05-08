@@ -15,6 +15,9 @@
     "evals:build": "tsc -p evals/tsconfig.json",
     "evals:create": "npm run evals:build && node evals/dist/scripts/create-run.js",
     "evals:aggregate": "npm run build:core && npm run evals:build && node evals/dist/scripts/aggregate-results.js",
+    "evals:finalize-run": "npm run build:core && npm run evals:build && node evals/dist/scripts/finalize-run.js",
+    "evals:validate-candidates": "npm run evals:build && node evals/dist/scripts/validate-candidates.js",
+    "evals:validate-batch-runs": "npm run evals:build && node evals/dist/scripts/validate-batch-runs.js",
     "test": "npm run test:core && npm run test:cli",
     "test:core": "npm run test -w @filepacks/core",
     "test:cli": "npm run test -w filepacks"

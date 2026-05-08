@@ -1,0 +1,19 @@
+{
+  "decision": "needs_review",
+  "confidence": null,
+  "review_started_at": null,
+  "review_ended_at": null,
+  "review_duration_minutes": null,
+  "missing_context_count": 0,
+  "clarification_request_count": 0,
+  "missed_regression_count": 0,
+  "re_review_count": 0,
+  "reusable_by_another_agent": null,
+  "reproduction_success": false,
+  "time_to_understand_minutes": null,
+  "notes": [
+    "OpenCode/Copilot attempted the run with github-copilot/gpt-5-mini.",
+    "Focused 204 tests passed and no patch was forced.",
+    "No artifact.fpk was created, so the no-repro run is preserved as incomplete and unmeasured."
+  ]
+}

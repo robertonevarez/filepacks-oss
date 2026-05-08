@@ -40,6 +40,55 @@
       "uniqueItems": true,
       "default": []
     },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_issue_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "issue_url": {
+      "type": "string",
+      "pattern": "^https://github\\.com/[^/]+/[^/]+/issues/[0-9]+$"
+    },
+    "executor_tool": {
+      "type": "string",
+      "enum": ["opencode"]
+    },
+    "provider": {
+      "type": "string",
+      "enum": ["github-copilot"]
+    },
+    "model_identifier": {
+      "type": ["string", "null"]
+    },
+    "base_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "base_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment_preflight": {
+      "type": "object"
+    },
+    "model_substitution_reason": {
+      "type": ["string", "null"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["not_executed", "incomplete", "completed", "failed", "rejected"]
+    },
+    "executor_prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "executor_command": {
+      "type": "string",
+      "minLength": 1
+    },
     "baseline_group": {
       "type": "string",
       "enum": ["loose_files", "filepacks_artifact"]

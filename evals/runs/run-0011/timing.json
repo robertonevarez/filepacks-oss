@@ -1,0 +1,9 @@
+{
+  "run_id": "run-0011",
+  "status": "not_executed",
+  "prepared_at": "2026-05-08T00:00:00.000Z",
+  "started_at": null,
+  "completed_at": null,
+  "duration_seconds": null,
+  "notes": "Timing will be completed by the executor during the future run."
+}

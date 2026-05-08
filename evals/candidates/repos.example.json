@@ -1,0 +1,15 @@
+[
+  {
+    "id": "example-tooling-repo",
+    "name": "Example Tooling Repo",
+    "url": "https://github.com/example/example-tooling-repo",
+    "license": "Apache-2.0",
+    "primary_language": "TypeScript",
+    "last_activity_checked_at": "2026-05-08T00:00:00.000Z",
+    "setup_command": "npm install",
+    "test_command": "npm test",
+    "build_command": "npm run build",
+    "notes": "Placeholder example only. Replace with a real public candidate after preflight.",
+    "status": "candidate"
+  }
+]

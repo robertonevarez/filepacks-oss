@@ -16,6 +16,10 @@ The corpus should use real engineering work only. Do not add synthetic benchmark
 
 ```text
 evals/
+  candidates/
+    repos.example.json
+    issues.example.json
+  methodology/
   runs/
     run-0001/
       run.json
@@ -31,6 +35,25 @@ evals/
 ```
 
 `baseline.fpk` is optional. All other files are expected for a completed run.
+
+## External OSS methodology
+
+The external OSS methodology prepares controlled runs using real public issues from external repositories and a non-Codex executor:
+
+- `evals/methodology/external-oss-runs.md`
+- `evals/methodology/repo-selection.md`
+- `evals/methodology/issue-selection.md`
+- `evals/methodology/executor-protocol-opencode-copilot.md`
+
+Codex may maintain the methodology, candidate templates, and local preflight tooling. Codex should not execute the controlled external issue attempts. The intended executor for those future runs is GitHub Copilot accessed through OpenCode.
+
+Candidate examples live in `evals/candidates/`. They are placeholders and should not be treated as selected repositories or issues.
+
+Validate local candidate files without network access:
+
+```bash
+npm run evals:validate-candidates
+```
 
 ## Create a run
 
@@ -75,6 +98,10 @@ The script writes:
 
 - `evals/reports/summary.json`
 - `evals/reports/summary.md`
+
+The generated summary also includes a current-state section that separates measured artifacts from completed runs, incomplete measured artifacts, infrastructure failures, invalid packaging attempts, no-repro/no-change artifacts, and held runs. These categories are descriptive. They are not benchmark scores.
+
+As of Batch 003, the strongest supported finding is protocol-level: deterministic finalization improved valid artifact production compared with executor-created packaging. The corpus does not yet support claims about agent correctness, model quality, or workflow improvement.
 
 ## Review fields
 

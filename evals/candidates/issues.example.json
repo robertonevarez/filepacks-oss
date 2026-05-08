@@ -1,0 +1,15 @@
+[
+  {
+    "id": "example-tooling-repo-issue-001",
+    "repo_id": "example-tooling-repo",
+    "issue_url": "https://github.com/example/example-tooling-repo/issues/1",
+    "issue_title": "Example issue title",
+    "issue_type": "bugfix",
+    "complexity": "small",
+    "reproducibility": "documented",
+    "validation_method": "Run npm test and a focused reproduction command.",
+    "expected_files_changed_range": "1-3",
+    "status": "candidate",
+    "notes": "Placeholder example only. Do not treat this as a selected real issue."
+  }
+]

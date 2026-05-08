@@ -1,0 +1,84 @@
+diff --git a/test/repro-2481-variants.mjs b/test/repro-2481-variants.mjs
+new file mode 100644
+index 0000000..d27bc66
+--- /dev/null
++++ b/test/repro-2481-variants.mjs
+@@ -0,0 +1,35 @@
++import yargs from '../index.mjs';
++
++function makeCommands() {
++  return yargs()
++    .command('help', 'Show help menu for commands', () => {})
++    .command('exit', 'Disconnect from the world', () => {})
++    .command('where', 'Get current location', () => {})
++    .command('come', 'Walk to the sender', () => {})
++    .command(
++      'build <prompt>',
++      'Build something based on a prompt',
++      (y) => y.positional('prompt', { type: 'string', describe: 'Prompt' })
++    );
++}
++
++function run(argv) {
++  try {
++    makeCommands()
++      .exitProcess(false)
++      .strictCommands()
++      .fail((msg) => {
++        throw new Error(msg);
++      })
++      .parseSync(argv);
++    console.log('OK:', argv);
++  } catch (e) {
++    console.error('THROW:', argv, '->', e.message);
++  }
++}
++
++// Variant A: single argv element 'fly away'
++run(['fly away']);
++
++// Variant B: split argv elements 'fly', 'away'
++run(['fly', 'away']);
+diff --git a/test/repro-2481.mjs b/test/repro-2481.mjs
+new file mode 100644
+index 0000000..6550ae4
+--- /dev/null
++++ b/test/repro-2481.mjs
+@@ -0,0 +1,37 @@
++import yargs from '../index.mjs';
++
++function makeCommands() {
++  return yargs()
++    .command('help', 'Show help menu for commands', () => {})
++    .command('exit', 'Disconnect from the world', () => {})
++    .command('where', 'Get current location', () => {})
++    .command('come', 'Walk to the sender', () => {})
++    .command(
++      'build <prompt>',
++      'Build something based on a prompt',
++      (y) => y.positional('prompt', { type: 'string', describe: 'Prompt' })
++    );
++}
++
++function parseCommand(input) {
++  // simple split to simulate stringArgv; this matches the user's example
++  const argv = input.split(/\s+/).filter(Boolean);
++  try {
++    return makeCommands()
++      .exitProcess(false)
++      .strictCommands()
++      .fail((msg) => {
++        // replicate user behavior: throw on fail
++        throw new Error(msg);
++      })
++      .parseSync(argv);
++  } catch (err) {
++    // print the thrown error message for reproduction capture
++    console.error('THROW:', err && err.message ? err.message : String(err));
++    // rethrow to preserve non-zero exit code if run directly
++    throw err;
++  }
++}
++
++// Run reproduction
++parseCommand('fly away');

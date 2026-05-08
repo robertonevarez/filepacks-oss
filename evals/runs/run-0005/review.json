@@ -1,0 +1,20 @@
+{
+  "decision": "needs_review",
+  "confidence": null,
+  "review_started_at": null,
+  "review_ended_at": null,
+  "review_duration_minutes": null,
+  "missing_context_count": 0,
+  "clarification_request_count": 0,
+  "missed_regression_count": 0,
+  "re_review_count": 0,
+  "reusable_by_another_agent": null,
+  "reproduction_success": true,
+  "time_to_understand_minutes": null,
+  "notes": [
+    "OpenCode/Copilot attempted the run with github-copilot/gpt-5-mini.",
+    "The executor reproduced test setup failures and made a small test-support change in the external workspace.",
+    "Validation reached 11 passing tests for tests/test_animate.py after installing the local pypiserver dependency.",
+    "No artifact.fpk was created, so this run is preserved as incomplete and unmeasured."
+  ]
+}

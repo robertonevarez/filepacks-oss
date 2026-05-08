@@ -1,0 +1,4 @@
+default: bar=baz
+allowEmptyArrays: foo[]&bar=baz
+comma + allowEmptyArrays: foo=&bar=baz
+comma only: bar=baz

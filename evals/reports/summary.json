@@ -1,25 +1,48 @@
 {
-  "generated_at": "2026-05-08T14:34:57.572Z",
-  "run_count": 0,
-  "measured_run_count": 0,
-  "task_type_counts": {},
-  "repository_counts": {},
+  "generated_at": "2026-05-08T18:33:34.911Z",
+  "run_count": 15,
+  "measured_run_count": 7,
+  "current_state": {
+    "measured_artifacts": 7,
+    "completed_runs": 5,
+    "incomplete_measured_artifacts": 2,
+    "infra_failures": 2,
+    "invalid_packaging_attempts": 2,
+    "no_repro_artifacts": 1,
+    "not_executed_runs": 1
+  },
+  "task_type_counts": {
+    "bugfix": 8,
+    "docs_update": 2,
+    "refactor": 4,
+    "test_repair": 1
+  },
+  "repository_counts": {
+    "sindresorhus/ky": 3,
+    "tj/commander.js": 2,
+    "pypa/pipx": 4,
+    "go-task/task": 1,
+    "ljharb/qs": 3,
+    "yargs/yargs": 2
+  },
   "review": {
-    "decisions": {},
+    "decisions": {
+      "needs_review": 2
+    },
     "average_review_duration_minutes": null,
     "clarification_request_count": 0,
     "missed_regression_count": 0,
     "re_review_count": 0
   },
   "evidence": {
-    "expected_count": 0,
-    "present_count": 0,
-    "missing_count": 0,
-    "average_missing_evidence_count": null
+    "expected_count": 76,
+    "present_count": 29,
+    "missing_count": 47,
+    "average_missing_evidence_count": 6.714
   },
   "verification": {
-    "pass_count": 0,
-    "pass_rate": null,
+    "pass_count": 7,
+    "pass_rate": 1,
     "mismatch_count": 0
   },
   "comparison": {
@@ -31,10 +54,849 @@
   },
   "reuse": {
     "reusable_by_another_agent_count": 0,
-    "reusable_by_another_agent_rate": null,
-    "reproduction_success_count": 0,
-    "reproduction_success_rate": null,
+    "reusable_by_another_agent_rate": 0,
+    "reproduction_success_count": 3,
+    "reproduction_success_rate": 0.2,
     "average_time_to_understand_minutes": null
   },
-  "runs": []
+  "runs": [
+    {
+      "id": "run-0001",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0001/artifact.fpk",
+        "directory": "evals/runs/run-0001"
+      },
+      "repository": "sindresorhus/ky",
+      "review": {
+        "decision": "needs_review",
+        "confidence": null,
+        "review_started_at": null,
+        "review_ended_at": null,
+        "review_duration_minutes": null,
+        "missing_context_count": 0,
+        "clarification_request_count": 0,
+        "missed_regression_count": 0,
+        "re_review_count": 0,
+        "reusable_by_another_agent": null,
+        "reproduction_success": false,
+        "time_to_understand_minutes": null,
+        "notes": [
+          "OpenCode/Copilot completed the attempt and produced artifact.fpk.",
+          "The reported issue was not reproduced in this environment; targeted validation passed.",
+          "No source changes were made and no model switch occurred."
+        ]
+      },
+      "status": "completed",
+      "task_type": "bugfix",
+      "timing": {
+        "agent_execution_seconds": null,
+        "artifact_packaging_seconds": null,
+        "review_seconds": null
+      },
+      "warnings": [],
+      "measurement": {
+        "candidate": {
+          "digest": "68e8de2fa164380529a2f7c90c7481333ba88932c693ea19c4ab8467273dd5a7",
+          "fileCount": 9,
+          "name": "agent-output",
+          "path": "/Users/robertonevarez/projects/filepacks/filepacks-oss/evals/runs/run-0001/artifact.fpk",
+          "totalBytes": 3666
+        },
+        "evidence": {
+          "expected": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch",
+            "metadata.json"
+          ],
+          "missing": [
+            "changes.patch"
+          ],
+          "missingCount": 1,
+          "present": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "metadata.json"
+          ],
+          "presentCount": 7
+        },
+        "review": {
+          "decision": "needs_review"
+        },
+        "verification": {
+          "filesChecked": 9,
+          "mismatchCount": 0,
+          "mismatches": [],
+          "ok": true
+        }
+      }
+    },
+    {
+      "id": "run-0002",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0002/artifact.fpk",
+        "directory": "evals/runs/run-0002"
+      },
+      "repository": "sindresorhus/ky",
+      "review": {
+        "decision": "needs_review",
+        "confidence": null,
+        "review_started_at": null,
+        "review_ended_at": null,
+        "review_duration_minutes": null,
+        "missing_context_count": 0,
+        "clarification_request_count": 0,
+        "missed_regression_count": 0,
+        "re_review_count": 0,
+        "reusable_by_another_agent": null,
+        "reproduction_success": null,
+        "time_to_understand_minutes": null,
+        "notes": [
+          "OpenCode/Copilot run failed before workspace creation, clone, issue reproduction, docs edit, validation, or packaging.",
+          "Failure was caused by an auto-rejected permission request for /tmp/*.",
+          "Model was not switched."
+        ]
+      },
+      "status": "failed",
+      "task_type": "docs_update",
+      "timing": {
+        "agent_execution_seconds": null,
+        "artifact_packaging_seconds": null,
+        "review_seconds": null
+      },
+      "warnings": [
+        "Missing artifact.fpk; run was not measured."
+      ]
+    },
+    {
+      "id": "run-0003",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0003/artifact.fpk",
+        "directory": "evals/runs/run-0003"
+      },
+      "repository": "tj/commander.js",
+      "review": {
+        "decision": "needs_review",
+        "confidence": null,
+        "review_started_at": null,
+        "review_ended_at": null,
+        "review_duration_minutes": null,
+        "missing_context_count": 0,
+        "clarification_request_count": 0,
+        "missed_regression_count": 0,
+        "re_review_count": 0,
+        "reusable_by_another_agent": null,
+        "reproduction_success": true,
+        "time_to_understand_minutes": null,
+        "notes": [
+          "OpenCode/Copilot completed the attempt and produced artifact.fpk.",
+          "The issue was reproduced with a focused test in the external workspace.",
+          "A minimal implementation/test patch was captured in changes.patch.",
+          "Model was not switched."
+        ]
+      },
+      "status": "completed",
+      "task_type": "refactor",
+      "timing": {
+        "agent_execution_seconds": null,
+        "artifact_packaging_seconds": null,
+        "review_seconds": null
+      },
+      "warnings": [],
+      "measurement": {
+        "candidate": {
+          "digest": "fbcfb653047d23d5a61ff3918c54f76f52a45a874986bd5a6e9d3fecbd809271",
+          "fileCount": 12,
+          "name": "agent-output",
+          "path": "/Users/robertonevarez/projects/filepacks/filepacks-oss/evals/runs/run-0003/artifact.fpk",
+          "totalBytes": 31145
+        },
+        "evidence": {
+          "expected": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch",
+            "metadata.json"
+          ],
+          "missing": [],
+          "missingCount": 0,
+          "present": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch",
+            "metadata.json"
+          ],
+          "presentCount": 8
+        },
+        "review": {
+          "decision": "needs_review"
+        },
+        "verification": {
+          "filesChecked": 12,
+          "mismatchCount": 0,
+          "mismatches": [],
+          "ok": true
+        }
+      }
+    },
+    {
+      "id": "run-0004",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0004/artifact.fpk",
+        "directory": "evals/runs/run-0004"
+      },
+      "repository": "tj/commander.js",
+      "review": {
+        "decision": "needs_review",
+        "confidence": null,
+        "review_started_at": null,
+        "review_ended_at": null,
+        "review_duration_minutes": null,
+        "missing_context_count": 0,
+        "clarification_request_count": 0,
+        "missed_regression_count": 0,
+        "re_review_count": 0,
+        "reusable_by_another_agent": null,
+        "reproduction_success": null,
+        "time_to_understand_minutes": null,
+        "notes": [
+          "OpenCode/Copilot shakedown failed before issue reproduction or fix. No artifact was created.",
+          "Failure was caused by an auto-rejected permission request for the external temporary clone path.",
+          "Model was not switched."
+        ]
+      },
+      "status": "failed",
+      "task_type": "bugfix",
+      "timing": {
+        "agent_execution_seconds": null,
+        "artifact_packaging_seconds": null,
+        "review_seconds": null
+      },
+      "warnings": [
+        "Missing artifact.fpk; run was not measured."
+      ]
+    },
+    {
+      "id": "run-0005",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0005/artifact.fpk",
+        "directory": "evals/runs/run-0005"
+      },
+      "repository": "pypa/pipx",
+      "review": {
+        "decision": "needs_review",
+        "confidence": null,
+        "review_started_at": null,
+        "review_ended_at": null,
+        "review_duration_minutes": null,
+        "missing_context_count": 0,
+        "clarification_request_count": 0,
+        "missed_regression_count": 0,
+        "re_review_count": 0,
+        "reusable_by_another_agent": null,
+        "reproduction_success": true,
+        "time_to_understand_minutes": null,
+        "notes": [
+          "OpenCode/Copilot attempted the run with github-copilot/gpt-5-mini.",
+          "The executor reproduced test setup failures and made a small test-support change in the external workspace.",
+          "Validation reached 11 passing tests for tests/test_animate.py after installing the local pypiserver dependency.",
+          "No artifact.fpk was created, so this run is preserved as incomplete and unmeasured."
+        ]
+      },
+      "status": "incomplete",
+      "task_type": "test_repair",
+      "timing": {
+        "agent_execution_seconds": null,
+        "artifact_packaging_seconds": null,
+        "review_seconds": null
+      },
+      "warnings": [
+        "Missing artifact.fpk; run was not measured."
+      ]
+    },
+    {
+      "id": "run-0006",
+      "artifact_tgz_present": true,
+      "paths": {
+        "artifact": "evals/runs/run-0006/artifact.fpk",
+        "directory": "evals/runs/run-0006"
+      },
+      "repository": "pypa/pipx",
+      "review": {
+        "decision": "needs_review",
+        "confidence": null,
+        "review_started_at": null,
+        "review_ended_at": null,
+        "review_duration_minutes": null,
+        "missing_context_count": 0,
+        "clarification_request_count": 0,
+        "missed_regression_count": 0,
+        "re_review_count": 0,
+        "reusable_by_another_agent": null,
+        "reproduction_success": false,
+        "time_to_understand_minutes": null,
+        "notes": [
+          "OpenCode/Copilot attempted the run with github-copilot/gpt-5-mini.",
+          "Pytest setup failed while updating the pipx package cache.",
+          "No source fix was attempted.",
+          "No artifact.fpk was created; artifact.tgz exists but is not measured."
+        ]
+      },
+      "status": "incomplete",
+      "task_type": "bugfix",
+      "timing": {
+        "agent_execution_seconds": null,
+        "artifact_packaging_seconds": null,
+        "review_seconds": null
+      },
+      "warnings": [
+        "Missing artifact.fpk; run was not measured."
+      ]
+    },
+    {
+      "id": "run-0007",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0007/artifact.fpk",
+        "directory": "evals/runs/run-0007"
+      },
+      "repository": "pypa/pipx",
+      "review": {
+        "decision": "needs_review",
+        "confidence": null,
+        "review_started_at": null,
+        "review_ended_at": null,
+        "review_duration_minutes": null,
+        "missing_context_count": 0,
+        "clarification_request_count": 0,
+        "missed_regression_count": 0,
+        "re_review_count": 0,
+        "reusable_by_another_agent": null,
+        "reproduction_success": true,
+        "time_to_understand_minutes": null,
+        "notes": [
+          "OpenCode/Copilot attempted the run with github-copilot/gpt-5-mini.",
+          "The executor made a small external-workspace change and reported targeted tests passing with --net-pypiserver.",
+          "artifact.fpk exists but is a tar/gzip file, not a valid filepacks artifact.",
+          "Run preserved as incomplete with invalid artifact packaging."
+        ]
+      },
+      "status": "incomplete",
+      "task_type": "refactor",
+      "timing": {
+        "agent_execution_seconds": null,
+        "artifact_packaging_seconds": null,
+        "review_seconds": null
+      },
+      "warnings": [
+        "Artifact is malformed and cannot be read."
+      ]
+    },
+    {
+      "id": "run-0008",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0008/artifact.fpk",
+        "directory": "evals/runs/run-0008"
+      },
+      "repository": "pypa/pipx",
+      "review": {
+        "decision": "needs_review",
+        "confidence": null,
+        "review_started_at": null,
+        "review_ended_at": null,
+        "review_duration_minutes": null,
+        "missing_context_count": 0,
+        "clarification_request_count": 0,
+        "missed_regression_count": 0,
+        "re_review_count": 0,
+        "reusable_by_another_agent": null,
+        "reproduction_success": false,
+        "time_to_understand_minutes": null,
+        "notes": [
+          "OpenCode/Copilot attempted the run with github-copilot/gpt-5-mini.",
+          "Validation failed in pipx test fixture setup due missing pip/pypi-server behavior.",
+          "External workspace files were modified, but no artifact.fpk was created.",
+          "Run preserved as incomplete."
+        ]
+      },
+      "status": "incomplete",
+      "task_type": "docs_update",
+      "timing": {
+        "agent_execution_seconds": null,
+        "artifact_packaging_seconds": null,
+        "review_seconds": null
+      },
+      "warnings": [
+        "Missing artifact.fpk; run was not measured."
+      ]
+    },
+    {
+      "id": "run-0009",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0009/artifact.fpk",
+        "directory": "evals/runs/run-0009"
+      },
+      "repository": "go-task/task",
+      "review": {
+        "decision": "needs_review",
+        "confidence": null,
+        "review_started_at": null,
+        "review_ended_at": null,
+        "review_duration_minutes": null,
+        "missing_context_count": 0,
+        "clarification_request_count": 0,
+        "missed_regression_count": 0,
+        "re_review_count": 0,
+        "reusable_by_another_agent": null,
+        "reproduction_success": null,
+        "time_to_understand_minutes": null,
+        "notes": [
+          "Run not executed. Review pending future artifact."
+        ]
+      },
+      "status": "not_executed",
+      "task_type": "bugfix",
+      "timing": {
+        "agent_execution_seconds": null,
+        "artifact_packaging_seconds": null,
+        "review_seconds": null
+      },
+      "warnings": [
+        "Missing artifact.fpk; run was not measured."
+      ]
+    },
+    {
+      "id": "run-0010",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0010/artifact.fpk",
+        "directory": "evals/runs/run-0010"
+      },
+      "repository": "sindresorhus/ky",
+      "review": {
+        "decision": "needs_review",
+        "confidence": null,
+        "review_started_at": null,
+        "review_ended_at": null,
+        "review_duration_minutes": null,
+        "missing_context_count": 0,
+        "clarification_request_count": 0,
+        "missed_regression_count": 0,
+        "re_review_count": 0,
+        "reusable_by_another_agent": null,
+        "reproduction_success": false,
+        "time_to_understand_minutes": null,
+        "notes": [
+          "OpenCode/Copilot attempted the run with github-copilot/gpt-5-mini.",
+          "Focused 204 tests passed and no patch was forced.",
+          "No artifact.fpk was created, so the no-repro run is preserved as incomplete and unmeasured."
+        ]
+      },
+      "status": "incomplete",
+      "task_type": "bugfix",
+      "timing": {
+        "agent_execution_seconds": null,
+        "artifact_packaging_seconds": null,
+        "review_seconds": null
+      },
+      "warnings": [
+        "Missing artifact.fpk; run was not measured."
+      ]
+    },
+    {
+      "id": "run-0011",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0011/artifact.fpk",
+        "directory": "evals/runs/run-0011"
+      },
+      "repository": "ljharb/qs",
+      "review": {
+        "run_id": "run-0011",
+        "status": "not_executed",
+        "review_possible": false,
+        "reviewer": null,
+        "verdict": null,
+        "notes": "No executor attempt has run yet, so no review is possible."
+      },
+      "status": "incomplete",
+      "task_type": "bugfix",
+      "timing": {
+        "run_id": "run-0011",
+        "status": "not_executed",
+        "prepared_at": "2026-05-08T00:00:00.000Z",
+        "started_at": null,
+        "completed_at": null,
+        "duration_seconds": null,
+        "notes": "Timing will be completed by the executor during the future run."
+      },
+      "warnings": [],
+      "measurement": {
+        "candidate": {
+          "digest": "c5df4252b6697a5c8e00a9b65dd15706f5ae287ac6b2e4aeac287c1f079f71b1",
+          "fileCount": 6,
+          "name": "run-0011",
+          "path": "/Users/robertonevarez/projects/filepacks/filepacks-oss/evals/runs/run-0011/artifact.fpk",
+          "totalBytes": 58094
+        },
+        "evidence": {
+          "expected": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch",
+            "no-changes.md",
+            "reproduction-notes.md",
+            "failure-log.md",
+            "incomplete-reason.md",
+            "metadata.json"
+          ],
+          "missing": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "no-changes.md",
+            "reproduction-notes.md",
+            "failure-log.md",
+            "incomplete-reason.md",
+            "metadata.json"
+          ],
+          "missingCount": 8,
+          "present": [
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch"
+          ],
+          "presentCount": 4
+        },
+        "verification": {
+          "filesChecked": 6,
+          "mismatchCount": 0,
+          "mismatches": [],
+          "ok": true
+        }
+      }
+    },
+    {
+      "id": "run-0012",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0012/artifact.fpk",
+        "directory": "evals/runs/run-0012"
+      },
+      "repository": "ljharb/qs",
+      "review": {
+        "run_id": "run-0012",
+        "status": "not_executed",
+        "review_possible": false,
+        "reviewer": null,
+        "verdict": null,
+        "notes": "No executor attempt has run yet, so no review is possible."
+      },
+      "status": "incomplete",
+      "task_type": "refactor",
+      "timing": {
+        "run_id": "run-0012",
+        "status": "not_executed",
+        "prepared_at": "2026-05-08T00:00:00.000Z",
+        "started_at": null,
+        "completed_at": null,
+        "duration_seconds": null,
+        "notes": "Timing will be completed by the executor during the future run."
+      },
+      "warnings": [],
+      "measurement": {
+        "candidate": {
+          "digest": "8bc14225f1b9369fcf49dca8a0be396406106992b487dc26a6d2a664fc21d3ea",
+          "fileCount": 1,
+          "name": "run-0012",
+          "path": "/Users/robertonevarez/projects/filepacks/filepacks-oss/evals/runs/run-0012/artifact.fpk",
+          "totalBytes": 0
+        },
+        "evidence": {
+          "expected": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch",
+            "no-changes.md",
+            "reproduction-notes.md",
+            "failure-log.md",
+            "incomplete-reason.md",
+            "metadata.json"
+          ],
+          "missing": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch",
+            "no-changes.md",
+            "reproduction-notes.md",
+            "failure-log.md",
+            "incomplete-reason.md",
+            "metadata.json"
+          ],
+          "missingCount": 12,
+          "present": [],
+          "presentCount": 0
+        },
+        "verification": {
+          "filesChecked": 1,
+          "mismatchCount": 0,
+          "mismatches": [],
+          "ok": true
+        }
+      }
+    },
+    {
+      "id": "run-0013",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0013/artifact.fpk",
+        "directory": "evals/runs/run-0013"
+      },
+      "repository": "ljharb/qs",
+      "review": {
+        "reviewed": true,
+        "notes": "No functional changes made. Baseline tests passed; benchmark added. Review was limited to reproducing and measuring performance; no code changes were required for this issue run."
+      },
+      "status": "completed",
+      "task_type": "refactor",
+      "timing": {
+        "start": "2026-05-08T15:43:00Z",
+        "end": "2026-05-08T15:47:00Z",
+        "duration_seconds": 240
+      },
+      "warnings": [],
+      "measurement": {
+        "candidate": {
+          "digest": "745a41ef63f820dc47fa91e354e44456f2807cdff4c4c3e21fedec05d8ff7ee6",
+          "fileCount": 9,
+          "name": "run-0013",
+          "path": "/Users/robertonevarez/projects/filepacks/filepacks-oss/evals/runs/run-0013/artifact.fpk",
+          "totalBytes": 63262
+        },
+        "evidence": {
+          "expected": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch",
+            "no-changes.md",
+            "reproduction-notes.md",
+            "failure-log.md",
+            "incomplete-reason.md",
+            "metadata.json"
+          ],
+          "missing": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "validation-output.txt",
+            "changes.patch",
+            "failure-log.md",
+            "incomplete-reason.md",
+            "metadata.json"
+          ],
+          "missingCount": 8,
+          "present": [
+            "commands-run.md",
+            "reproduction-output.txt",
+            "no-changes.md",
+            "reproduction-notes.md"
+          ],
+          "presentCount": 4
+        },
+        "verification": {
+          "filesChecked": 9,
+          "mismatchCount": 0,
+          "mismatches": [],
+          "ok": true
+        }
+      }
+    },
+    {
+      "id": "run-0014",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0014/artifact.fpk",
+        "directory": "evals/runs/run-0014"
+      },
+      "repository": "yargs/yargs",
+      "review": {
+        "reviewed": true,
+        "can_review_patch": true,
+        "notes": "Added repro scripts and ran tests. Issue reproduction unconfirmed for the exact error reported; tests show correct unknown-command behavior."
+      },
+      "status": "completed",
+      "task_type": "bugfix",
+      "timing": {
+        "start": "2026-05-08T11:30:00-07:00",
+        "end": "2026-05-08T11:50:00-07:00",
+        "duration_seconds": 1200
+      },
+      "warnings": [],
+      "measurement": {
+        "candidate": {
+          "digest": "651ecd80465670b67b909162246148bbe63dc0a3a11edf7192a7091c6dba6037",
+          "fileCount": 6,
+          "name": "run-0014",
+          "path": "/Users/robertonevarez/projects/filepacks/filepacks-oss/evals/runs/run-0014/artifact.fpk",
+          "totalBytes": 60773
+        },
+        "evidence": {
+          "expected": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch",
+            "no-changes.md",
+            "reproduction-notes.md",
+            "failure-log.md",
+            "incomplete-reason.md",
+            "metadata.json"
+          ],
+          "missing": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "validation-output.txt",
+            "no-changes.md",
+            "reproduction-notes.md",
+            "failure-log.md",
+            "incomplete-reason.md",
+            "metadata.json"
+          ],
+          "missingCount": 9,
+          "present": [
+            "commands-run.md",
+            "reproduction-output.txt",
+            "changes.patch"
+          ],
+          "presentCount": 3
+        },
+        "verification": {
+          "filesChecked": 6,
+          "mismatchCount": 0,
+          "mismatches": [],
+          "ok": true
+        }
+      }
+    },
+    {
+      "id": "run-0015",
+      "artifact_tgz_present": false,
+      "paths": {
+        "artifact": "evals/runs/run-0015/artifact.fpk",
+        "directory": "evals/runs/run-0015"
+      },
+      "repository": "yargs/yargs",
+      "review": {
+        "review": "patch",
+        "changes": [
+          "lib/validation.ts: ignore object-valued argv keys when checking unknown arguments (to avoid false positives for nested config objects).",
+          "build/lib/validation.js: built equivalent change for runtime.",
+          "Evidence files captured: reproduction-output-*.txt, options-snapshot.txt, changes.patch"
+        ],
+        "tests_run": "partial",
+        "notes": "Change is minimal and targeted. Full test run was not executed post-edit to save time; main earlier test run passed."
+      },
+      "status": "completed",
+      "task_type": "bugfix",
+      "timing": {
+        "start": "2026-05-08T11:43:00Z",
+        "end": "2026-05-08T11:59:00Z",
+        "duration_seconds": 960
+      },
+      "warnings": [],
+      "measurement": {
+        "candidate": {
+          "digest": "26c806423f66283c018a28236138f8255309c31c3fbe15414784d19aa253292c",
+          "fileCount": 13,
+          "name": "run-0015",
+          "path": "/Users/robertonevarez/projects/filepacks/filepacks-oss/evals/runs/run-0015/artifact.fpk",
+          "totalBytes": 6466
+        },
+        "evidence": {
+          "expected": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch",
+            "no-changes.md",
+            "reproduction-notes.md",
+            "failure-log.md",
+            "incomplete-reason.md",
+            "metadata.json"
+          ],
+          "missing": [
+            "agent-task-summary.md",
+            "issue-metadata.json",
+            "repo-metadata.json",
+            "commands-run.md",
+            "no-changes.md",
+            "reproduction-notes.md",
+            "failure-log.md",
+            "incomplete-reason.md",
+            "metadata.json"
+          ],
+          "missingCount": 9,
+          "present": [
+            "reproduction-output.txt",
+            "validation-output.txt",
+            "changes.patch"
+          ],
+          "presentCount": 3
+        },
+        "verification": {
+          "filesChecked": 13,
+          "mismatchCount": 0,
+          "mismatches": [],
+          "ok": true
+        }
+      }
+    }
+  ]
 }

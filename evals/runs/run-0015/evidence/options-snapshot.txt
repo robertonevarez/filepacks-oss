@@ -1,0 +1,37 @@
+options snapshot: {
+  "local": [],
+  "configObjects": [],
+  "array": [],
+  "boolean": [
+    "help",
+    "version"
+  ],
+  "string": [
+    "auth.username",
+    "auth.password"
+  ],
+  "skipValidation": [],
+  "count": [],
+  "normalize": [],
+  "number": [],
+  "hiddenOptions": [],
+  "narg": {},
+  "key": {
+    "help": true,
+    "version": true,
+    "auth.username": true,
+    "auth.password": true,
+    "config": true
+  },
+  "alias": {},
+  "default": {},
+  "defaultDescription": {},
+  "config": {
+    "config": true
+  },
+  "choices": {},
+  "demandedOptions": {},
+  "demandedCommands": {},
+  "deprecatedOptions": {},
+  "showHiddenOpt": "show-hidden"
+}

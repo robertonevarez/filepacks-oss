@@ -1,0 +1,2 @@
+origin	https://github.com/pypa/pipx (fetch)
+origin	https://github.com/pypa/pipx (push)
