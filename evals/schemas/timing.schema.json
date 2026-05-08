@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.filepacks.dev/evals/timing.schema.json",
+  "title": "filepacks eval timing metadata",
+  "type": "object",
+  "required": ["agent_execution_seconds", "artifact_packaging_seconds", "review_seconds"],
+  "additionalProperties": false,
+  "properties": {
+    "agent_execution_seconds": {
+      "type": ["number", "null"],
+      "minimum": 0
+    },
+    "artifact_packaging_seconds": {
+      "type": ["number", "null"],
+      "minimum": 0
+    },
+    "review_seconds": {
+      "type": ["number", "null"],
+      "minimum": 0
+    }
+  }
+}

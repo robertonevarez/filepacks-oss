@@ -12,6 +12,9 @@
     "docs:dev": "cd docs && mint dev --port 3001",
     "docs:validate": "npm_config_yes=true npx -p node@22 -c 'cd docs && mint validate'",
     "docs:links": "npm_config_yes=true npx -p node@22 -c 'cd docs && mint broken-links'",
+    "evals:build": "tsc -p evals/tsconfig.json",
+    "evals:create": "npm run evals:build && node evals/dist/scripts/create-run.js",
+    "evals:aggregate": "npm run build:core && npm run evals:build && node evals/dist/scripts/aggregate-results.js",
     "test": "npm run test:core && npm run test:cli",
     "test:core": "npm run test -w @filepacks/core",
     "test:cli": "npm run test -w filepacks"

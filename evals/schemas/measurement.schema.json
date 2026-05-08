@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.filepacks.dev/evals/measurement.schema.json",
+  "title": "filepacks eval measurement summary",
+  "description": "Shape of the per-run measurement object written into reports. The source of truth is @filepacks/core measureRunEvidence().",
+  "type": "object",
+  "required": ["candidate", "evidence", "verification"],
+  "additionalProperties": true,
+  "properties": {
+    "baseline": {
+      "type": "object"
+    },
+    "candidate": {
+      "type": "object",
+      "required": ["digest", "fileCount", "name", "path", "totalBytes"],
+      "additionalProperties": true,
+      "properties": {
+        "digest": {"type": "string"},
+        "fileCount": {"type": "integer", "minimum": 0},
+        "name": {"type": "string"},
+        "path": {"type": "string"},
+        "totalBytes": {"type": "integer", "minimum": 0}
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "added": {"type": "integer", "minimum": 0},
+        "changed": {"type": "integer", "minimum": 0},
+        "ok": {"type": "boolean"},
+        "removed": {"type": "integer", "minimum": 0},
+        "totalChangedFiles": {"type": "integer", "minimum": 0}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["expected", "missing", "missingCount", "present", "presentCount"],
+      "additionalProperties": true,
+      "properties": {
+        "expected": {"type": "array", "items": {"type": "string"}},
+        "missing": {"type": "array", "items": {"type": "string"}},
+        "missingCount": {"type": "integer", "minimum": 0},
+        "present": {"type": "array", "items": {"type": "string"}},
+        "presentCount": {"type": "integer", "minimum": 0}
+      }
+    },
+    "review": {
+      "type": "object"
+    },
+    "verification": {
+      "type": "object",
+      "required": ["filesChecked", "mismatchCount", "mismatches", "ok"],
+      "additionalProperties": true,
+      "properties": {
+        "filesChecked": {"type": "integer", "minimum": 0},
+        "mismatchCount": {"type": "integer", "minimum": 0},
+        "mismatches": {"type": "array"},
+        "ok": {"type": "boolean"}
+      }
+    }
+  }
+}

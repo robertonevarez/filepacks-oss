@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.filepacks.dev/evals/run.schema.json",
+  "title": "filepacks eval run metadata",
+  "type": "object",
+  "required": ["id", "task_type", "repository", "agent", "model", "timestamp"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^run-[0-9]{4,}$"
+    },
+    "task_type": {
+      "type": "string",
+      "enum": ["bugfix", "refactor", "docs_update", "ui_change", "db_migration", "api_integration", "ci_fix", "test_repair", "other"]
+    },
+    "repository": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expected_evidence_paths": {
+      "description": "Paths passed to measureRunEvidence().expectedEvidencePaths.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "baseline_group": {
+      "type": "string",
+      "enum": ["loose_files", "filepacks_artifact"]
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

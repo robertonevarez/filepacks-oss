@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.filepacks.dev/evals/review.schema.json",
+  "title": "filepacks eval review metadata",
+  "type": "object",
+  "required": ["decision", "confidence", "missing_context_count", "reusable_by_another_agent"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "description": "Mapped to measureRunEvidence().review.decision.",
+      "type": "string",
+      "enum": ["approved", "rejected", "needs_review"]
+    },
+    "confidence": {
+      "description": "Mapped to measureRunEvidence().review.confidence.",
+      "type": ["string", "null"],
+      "enum": ["low", "medium", "high", null]
+    },
+    "review_started_at": {
+      "description": "Mapped to measureRunEvidence().review.startedAt.",
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "review_ended_at": {
+      "description": "Mapped to measureRunEvidence().review.endedAt.",
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "review_duration_minutes": {
+      "description": "Optional manually recorded review duration when exact timestamps are unavailable.",
+      "type": ["number", "null"],
+      "minimum": 0
+    },
+    "missing_context_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "clarification_request_count": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "missed_regression_count": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "re_review_count": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "reusable_by_another_agent": {
+      "description": "Mapped to measureRunEvidence().review.reusableByAnotherAgent.",
+      "type": ["boolean", "null"]
+    },
+    "reproduction_success": {
+      "type": ["boolean", "null"]
+    },
+    "time_to_understand_minutes": {
+      "type": ["number", "null"],
+      "minimum": 0
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-05-08T14:34:57.572Z",
+  "run_count": 0,
+  "measured_run_count": 0,
+  "task_type_counts": {},
+  "repository_counts": {},
+  "review": {
+    "decisions": {},
+    "average_review_duration_minutes": null,
+    "clarification_request_count": 0,
+    "missed_regression_count": 0,
+    "re_review_count": 0
+  },
+  "evidence": {
+    "expected_count": 0,
+    "present_count": 0,
+    "missing_count": 0,
+    "average_missing_evidence_count": null
+  },
+  "verification": {
+    "pass_count": 0,
+    "pass_rate": null,
+    "mismatch_count": 0
+  },
+  "comparison": {
+    "baseline_count": 0,
+    "added_count": 0,
+    "changed_count": 0,
+    "removed_count": 0,
+    "total_changed_files": 0
+  },
+  "reuse": {
+    "reusable_by_another_agent_count": 0,
+    "reusable_by_another_agent_rate": null,
+    "reproduction_success_count": 0,
+    "reproduction_success_rate": null,
+    "average_time_to_understand_minutes": null
+  },
+  "runs": []
+}
