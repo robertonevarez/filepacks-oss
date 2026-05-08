@@ -84,6 +84,7 @@ npx filepacks compare ./baseline.fpk ./run.fpk
 - [CLI workflows](docs/cli/workflows.mdx)
 - [Use cases](docs/use-cases.mdx)
 - [Agent workflows](docs/agent-workflows.mdx)
+- [Run evidence measurement](docs/run-evidence-measurement.mdx)
 - [Artifact reference](docs/artifacts/index.mdx)
 - [Specification](spec/FILEPACK_SPEC.md)
 

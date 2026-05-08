@@ -1,0 +1,128 @@
+---
+title: Run evidence measurement
+description: Measure the evidence package around a run without adding a registry, dashboard, or benchmark claim.
+---
+
+filepacks can help measure the evidence package around an agent run by turning run output into a stable artifact, then reporting facts about that artifact and its baseline comparison.
+
+The measurement should live in your harness or review workflow. filepacks supplies artifact facts; your workflow supplies task labels, reviewer timing, decision, and confidence.
+
+## What to measure first
+
+Start with signals that are already observable from `.fpk` artifacts:
+
+- whether the candidate artifact verifies
+- how many payload files were checked
+- how many verification mismatches were found
+- whether the candidate differs from a baseline
+- how many files were added, changed, or removed
+- whether expected evidence files were included
+
+Then add human or harness fields that filepacks cannot infer:
+
+- review start and end timestamps
+- reviewer decision
+- reviewer confidence
+- whether another agent could reuse the artifact
+
+This avoids fake benchmark numbers while still producing structured evidence data you can aggregate across real runs.
+
+## Core API
+
+Use `measureRunEvidence()` from `@filepacks/core` when your harness already runs in Node.js:
+
+```ts
+import {measureRunEvidence} from '@filepacks/core'
+
+const measurement = await measureRunEvidence({
+  baseline: './accepted-run.fpk',
+  candidate: './candidate-run.fpk',
+  expectedEvidencePaths: [
+    'agent-task-summary.md',
+    'changes.patch',
+    'test-output.txt',
+    'metadata.json',
+  ],
+  review: {
+    startedAt: '2026-05-08T12:00:00.000Z',
+    endedAt: '2026-05-08T12:07:30.000Z',
+    decision: 'approved',
+    confidence: 'medium',
+    reusableByAnotherAgent: true,
+  },
+})
+
+console.log(JSON.stringify(measurement, null, 2))
+```
+
+The result is plain JSON-serializable evidence data:
+
+```json
+{
+  "candidate": {
+    "name": "candidate-run",
+    "fileCount": 4,
+    "totalBytes": 1824
+  },
+  "verification": {
+    "ok": true,
+    "filesChecked": 4,
+    "mismatchCount": 0
+  },
+  "comparison": {
+    "ok": false,
+    "added": 1,
+    "changed": 2,
+    "removed": 0,
+    "totalChangedFiles": 3
+  },
+  "evidence": {
+    "presentCount": 4,
+    "missingCount": 0
+  },
+  "review": {
+    "decision": "approved",
+    "confidence": "medium",
+    "durationMs": 450000,
+    "reusableByAnotherAgent": true
+  }
+}
+```
+
+The exact digests, paths, mismatch details, and evidence paths are also included in the returned object.
+
+## Harness pattern
+
+1. Record the run start time in your harness.
+2. Let the agent write files into a run output directory.
+3. Pack the directory immediately:
+
+   ```bash
+   npx filepacks pack ./agent-output --output ./candidate-run.fpk
+   ```
+
+4. Run `measureRunEvidence()` with an explicit baseline artifact if one exists.
+5. Record reviewer start and end timestamps around the human review step.
+6. Store the measurement JSON next to your run logs, CI artifact, or experiment record.
+
+## What filepacks does not infer
+
+filepacks does not decide whether a task was completed correctly, whether an agent is intelligent, or whether a run is good. It also does not infer review quality or business impact.
+
+Keep those fields explicit in your harness. A reviewer can mark the reviewed evidence as approved or rejected, and your aggregate analysis can later compare review duration, missing evidence, verification failures, and baseline changes across real runs.
+
+## Minimal schema guidance
+
+For early data collection, one JSON object per run is enough:
+
+```json
+{
+  "runId": "2026-05-08-agent-17",
+  "task": "checkout fix",
+  "model": "agent-name-or-version",
+  "artifact": "candidate-run.fpk",
+  "measurement": {}
+}
+```
+
+Put the `measureRunEvidence()` result in `measurement`. Add task and model labels only if they are safe to store in that environment.

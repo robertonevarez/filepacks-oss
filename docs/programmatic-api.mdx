@@ -15,6 +15,7 @@ The package exposes the same artifact primitives as the public CLI:
 - `inspect()` reads artifact metadata and manifest entries
 - `verify()` checks the payload against the manifest
 - `compare()` structurally compares baseline and candidate artifacts
+- `measureRunEvidence()` summarizes verification, optional baseline comparison, expected evidence paths, and reviewer metadata for local harnesses
 
 The stable current surfaces are the `.fpk` artifact format, the `filepacks` CLI, and `@filepacks/core`. The package is not a hosted API client.
 
@@ -60,6 +61,8 @@ const diff = await compare({
 
 `compare()` returns `ok`, summary counts, and per-file added, removed, and changed details.
 
+`measureRunEvidence()` returns a JSON-serializable measurement object for harnesses that want evidence-package data without adding registry or dashboard behavior.
+
 ## Common use cases
 
 Use `@filepacks/core` when you want to:
@@ -67,6 +70,7 @@ Use `@filepacks/core` when you want to:
 - package agent output at the end of a run
 - verify a `.fpk` before handing it to another tool
 - compare eval or regression outputs inside a test harness
+- collect grounded measurement data from run evidence packages
 - store structured artifact metadata in your own workflow
 - build review automation without shelling out to the CLI
 
@@ -103,6 +107,33 @@ if (!diff.ok) {
 }
 ```
 
+## Example: measure run evidence
+
+```ts
+import {measureRunEvidence} from '@filepacks/core'
+
+const measurement = await measureRunEvidence({
+  baseline: './accepted-run.fpk',
+  candidate: './candidate-run.fpk',
+  expectedEvidencePaths: [
+    'agent-task-summary.md',
+    'changes.patch',
+    'test-output.txt',
+  ],
+  review: {
+    startedAt: '2026-05-08T12:00:00.000Z',
+    endedAt: '2026-05-08T12:05:30.000Z',
+    decision: 'approved',
+    confidence: 'medium',
+    reusableByAnotherAgent: true,
+  },
+})
+
+console.log(JSON.stringify(measurement, null, 2))
+```
+
+Use this to collect measurable fields such as verification status, mismatch count, structural change count, missing expected evidence, review duration, reviewer decision, and reviewer confidence. This measures the review evidence around a run, not task correctness or agent quality. See [Run evidence measurement](/run-evidence-measurement) for the recommended workflow.
+
 ## Planned platform direction
 
 A future hosted API may coordinate team review state, agent handoff, policy checks, and workflow metadata around verified artifacts.
@@ -116,5 +147,6 @@ Start with the local artifact contract: create a `.fpk`, verify it, and compare 
 - [Quickstart](/quickstart)
 - [Concepts](/concepts)
 - [Agent workflows](/agent-workflows)
+- [Run evidence measurement](/run-evidence-measurement)
 - [CI/CD Integration](/ci-cd-integration)
 - [CLI workflows](/cli/workflows)

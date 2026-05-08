@@ -17,6 +17,7 @@ npm install @filepacks/core
 - `inspect()`
 - `verify()`
 - `compare()`
+- `measureRunEvidence()`
 - shared manifest, file, and diff types
 
 The `.fpk` artifact format is intended to remain stable starting with v0.1.0. Programmatic APIs may change before v1.0.
@@ -24,12 +25,16 @@ The `.fpk` artifact format is intended to remain stable starting with v0.1.0. Pr
 ## Minimal example
 
 ```ts
-import {pack, inspect, verify, compare} from '@filepacks/core'
+import {pack, inspect, verify, compare, measureRunEvidence} from '@filepacks/core'
 
 await pack({input: '/tmp/input', output: '/tmp/example.fpk'})
 const artifact = await inspect({artifact: '/tmp/example.fpk'})
 const verification = await verify({artifact: '/tmp/example.fpk'})
 const diff = await compare({
+  baseline: '/tmp/baseline.fpk',
+  candidate: '/tmp/example.fpk',
+})
+const measurement = await measureRunEvidence({
   baseline: '/tmp/baseline.fpk',
   candidate: '/tmp/example.fpk',
 })
@@ -41,6 +46,7 @@ const diff = await compare({
 - `inspect()` returns the manifest, payload file entries, and archive digest
 - `verify()` returns `ok`, mismatch details, and checked file count
 - `compare()` returns `ok`, summary counts, and added/removed/changed file details
+- `measureRunEvidence()` returns JSON-serializable evidence-package measurement data composed from verification, optional comparison, expected evidence paths, and optional reviewer metadata
 
 ## Common patterns
 
@@ -75,6 +81,28 @@ const diff = await compare({
 if (!diff.ok) {
   console.log(diff.summary)
 }
+```
+
+### Measure run evidence in a harness
+
+```ts
+const measurement = await measureRunEvidence({
+  baseline: '/tmp/baseline.fpk',
+  candidate: '/tmp/candidate.fpk',
+  expectedEvidencePaths: ['agent-task-summary.md', 'test-output.txt'],
+  review: {
+    startedAt: '2026-05-08T12:00:00.000Z',
+    endedAt: '2026-05-08T12:05:30.000Z',
+    decision: 'approved',
+    confidence: 'medium',
+    reusableByAnotherAgent: true,
+  },
+})
+
+console.log(measurement.verification.ok)
+console.log(measurement.comparison?.totalChangedFiles)
+console.log(measurement.evidence.missingCount)
+console.log(measurement.review?.durationMs)
 ```
 
 ## Out of scope
