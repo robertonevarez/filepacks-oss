@@ -1,15 +1,13 @@
 ---
 title: Quickstart
-description: Go from a generated directory to a verified and comparable .fpk artifact in a few minutes.
+description: Go from a directory of output to a verified, portable .fpk in under a minute.
 ---
 
-This walkthrough takes a directory of generated output, turns it into a `.fpk` artifact, and shows how to review it.
-
-The same pattern works for agent runs, eval snapshots, CI reports, and any other workflow that emits files.
+Go from a directory of output to a verified, portable .fpk in under a minute.
 
 ## Install the CLI
 
-Quick trial from a clean shell:
+filepacks requires Node.js `>=18.0.0`. Run it from a clean shell with `npx`:
 
 ```bash
 npx filepacks --help
@@ -24,123 +22,40 @@ filepacks --help
 
 The commands below use `npx filepacks ...` so the walkthrough stays copy-pasteable from a clean local state.
 
-## Create example output directories
+## Step 1. Pack a run
+
+Point filepacks at any directory. It seals the files into one .fpk with a canonical manifest and a per-file SHA-256.
 
 ```bash
-mkdir -p ./demo/baseline
-mkdir -p ./demo/candidate
-
-printf 'hello from baseline\n' > ./demo/baseline/summary.txt
-printf 'hello from candidate\n' > ./demo/candidate/summary.txt
+npx filepacks pack ./run --output run.fpk
 ```
 
-You now have two output directories that differ by one file.
+## Step 2. Inspect it
 
-## Pack each directory
+See what got packaged without unpacking it.
 
 ```bash
-npx filepacks pack ./demo/baseline --output ./baseline.fpk
-npx filepacks pack ./demo/candidate --output ./candidate.fpk
+npx filepacks inspect run.fpk
 ```
 
-`pack` writes a deterministic `.fpk` archive and prints a summary like:
+## Step 3. Verify it
 
-```text
-Pack
-input=/absolute/path/to/demo/baseline
-output=/absolute/path/to/baseline.fpk
-name=baseline
-digest=sha256:...
-files=1
-bytes=20
-```
-
-`pack` creates one portable `.fpk` file per directory. The archive digest is printed as `sha256:<hex>`.
-
-## Inspect what you created
+Confirm the artifact is byte-for-byte what was produced. Same input, same bytes, every time.
 
 ```bash
-npx filepacks inspect ./baseline.fpk
+npx filepacks verify run.fpk
 ```
 
-Example output:
+## Step 4. Compare two runs
 
-```text
-Inspect
-path=/absolute/path/to/baseline.fpk
-name=baseline
-version=1
-digest=sha256:...
-files=1
-bytes=20
-```
-
-Use `inspect` when you want a quick summary: artifact name, format version, digest, file count, and total bytes.
-
-## Verify integrity before trusting it
+Pack a second run, then diff it against the first to see what changed when you adjusted a prompt, model, or tool.
 
 ```bash
-npx filepacks verify ./baseline.fpk
+npx filepacks compare baseline.fpk run.fpk
 ```
 
-Example output:
+## What's in a .fpk
 
-```text
-Verify
-path=/absolute/path/to/baseline.fpk
-ok=true
-files_checked=1
-```
+A .fpk is a sealed archive with two parts: a manifest with the canonical file list and digests, and the payload, which is the original files kept readable. Humans review the payload, tooling reads the manifest.
 
-Use `verify` before sharing an artifact, uploading it, or using it as a baseline. It confirms that the payload still matches the manifest.
-
-## Compare baseline and candidate
-
-```bash
-npx filepacks compare ./baseline.fpk ./candidate.fpk
-```
-
-If the artifacts differ, `compare` exits with status `20` and prints a structural summary:
-
-```text
-Compare
-baseline=/absolute/path/to/baseline.fpk
-candidate=/absolute/path/to/candidate.fpk
-ok=false
-added=0
-removed=0
-changed=1
-changed_file=summary.txt
-```
-
-If the artifacts are identical, `compare` exits `0` with `ok=true`.
-
-In automation, the exit code matters:
-
-- `0` means the candidate matches the baseline
-- `20` means one or more packaged files changed
-- `1` means the command was used incorrectly or an artifact could not be read
-
-## What to look at next
-
-When `compare` reports a change:
-
-1. Use the `changed_file=`, `added_file=`, and `removed_file=` lines to find the affected paths.
-2. Review the original output directories or the files inside the `.fpk` artifact in your own tooling.
-3. If the change is acceptable, store the candidate artifact explicitly as the next baseline. The public OSS CLI does not manage baselines for you.
-
-## What you just used
-
-- `filepacks pack <input> --output <file>`
-- `filepacks inspect <file>`
-- `filepacks verify <file>`
-- `filepacks compare <baseline> <candidate>`
-
-Those four commands are the current public CLI surface.
-
-## Next steps
-
-1. Read [Why filepacks](/why-filepacks) for when the artifact model is useful.
-2. Use [CLI workflows](/cli/workflows) for repeatable patterns in scripts, CI, and short AI-assisted-work demos.
-3. Read [Use cases](/use-cases) for eval, agent, and review scenarios.
-4. Use [Artifacts](/artifacts) when you need format-level details.
+[CLI reference](/cli) for all four commands and their options.
