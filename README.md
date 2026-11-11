@@ -1,8 +1,8 @@
 # filepacks
 
-Portable, inspectable artifacts for AI-generated work, agent workflows, CI evidence, and repeatable file review.
+Reviewable execution artifacts for AI-generated work, agent workflows, and repeatable evidence review.
 
-filepacks turns a directory of generated files into a deterministic `.fpk` artifact that you can inspect, verify, compare, and hand off as durable evidence.
+filepacks captures agent-generated files into a deterministic `.fpk` artifact: a portable, inspectable, verifiable container with a stable identity that humans and future agents can both use.
 
 The public OSS surface is intentionally small:
 
@@ -15,13 +15,13 @@ filepacks compare <baseline> <candidate>
 
 ## Why it exists
 
-Loose output directories are easy to create but awkward to trust. They have no stable identity, no canonical manifest, and no built-in verification step.
+Agent runs leave behind scattered evidence: logs, files, test output, screenshots, summaries. Teams need a stable way to review, compare, and preserve what actually happened.
 
 filepacks adds:
 
 - **one portable file** instead of a loose directory tree
 - **a canonical `manifest.json`** with file paths, sizes, and hashes
-- **deterministic archive bytes** for the same logical input
+- **deterministic artifact bytes** for the same logical input
 - **local verification** before review or handoff
 - **structural comparison** for baseline-versus-candidate workflows
 
@@ -29,10 +29,10 @@ filepacks adds:
 
 filepacks works well when you want:
 
-- agent run outputs captured as portable artifacts
+- agent run outputs captured as portable, reviewable artifacts
 - eval result snapshots compared across runs
-- CI-generated reports preserved for human review
-- prompt or model output directories compared structurally
+- CI-generated reports preserved as evidence
+- agent work compared structurally (baseline vs. latest)
 - a deterministic artifact boundary that humans and automation can both use
 
 ## Not in the v0 OSS surface
@@ -65,10 +65,10 @@ The quick trial uses `npx` so the workflow stays copy-pasteable without putting 
 Core workflow:
 
 ```bash
-npx filepacks pack ./run-output --output ./run.fpk
-npx filepacks inspect ./run.fpk
-npx filepacks verify ./run.fpk
-npx filepacks compare ./baseline.fpk ./run.fpk
+npx filepacks pack ./run-output --output ./baseline.fpk
+npx filepacks inspect ./baseline.fpk
+npx filepacks verify ./baseline.fpk
+npx filepacks compare ./baseline.fpk ./latest.fpk
 ```
 
 ## Packages
